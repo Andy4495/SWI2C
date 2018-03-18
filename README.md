@@ -10,8 +10,8 @@ However, this library was written without any platform-specific code, and should
 
 Is not a drop-in replacement for Wire (which has its own shortcomings). Therefore need to write your own code for modules that need to use this library. However, the interface is kept simple while still providing low-level signaling functionality to allow tailoring to your specific application.
 
-Clock speed of approximately .... MHz when using the ... MHz.
-- Add a scope trace showing SDA/SCK signalling. 
+Clock speed of approximately .... MHz when using the ... MHz clock.
+- Add a scope trace showing SDA/SCK signalling.
 
 Shortcomings of other libraries:
 - Hardcoded delays
@@ -19,6 +19,13 @@ Shortcomings of other libraries:
 - Lack of or incorrect support of clock stretching
 - Improper pin mode settings for "HIGH" value
   - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in "INPUT" mode, which effectively disconnects the signal from the I2C bus (a High Impedance state) allows the pull-ups to indicate the high level.
+
+Future Updates
+--------------
+Error checking
+Generic size of read/write data bytes
+Choosing MSByte or LSByte first in multi-bute data read/write
+
 
 Usage
 -----
@@ -64,6 +71,7 @@ sclHi() function: waits until line actually goes high before returning (clock st
 References
 ---------------------
 
-+ Texas Instruments I2C [Application Report] (http://www.ti.com/lit/an/slva704/slva704.pdf)
++ NXP [I2C Bus Specification and User Manual] (https://www.nxp.com/docs/en/user-guide/UM10204.pdf)
+Texas Instruments I2C [Application Report] (http://www.ti.com/lit/an/slva704/slva704.pdf)
 + Clock Stretching https://www.i2c-bus.org/clock-stretching/
 + Reference related to using INPUT mode for "HIGH" value and high-impedance state

@@ -70,6 +70,7 @@ void SWI2C::writeAddress(int r_w) {  // Assume SCL, SDA already LOW from startBi
   sclHi();
   sclLo();
   if (r_w == 1) sdaHi();         // R/W bit
+  else sdaLo();
   sclHi();
   sclLo();
   sdaHi();    // Release the data line for ACK signal from slave
@@ -164,32 +165,8 @@ uint8_t SWI2C::read1Byte() {
 }
 
 uint16_t SWI2C::read2Byte() {
+  // Assumes LEAST significant BYTE is transferred first
   uint16_t value = 0;
-  sclHi();
-  if (digitalRead(_sda_pin) == 1) value += 0x8000;
-  sclLo();
-  sclHi();
-  if (digitalRead(_sda_pin) == 1) value += 0x4000;
-  sclLo();
-  sclHi();
-  if (digitalRead(_sda_pin) == 1) value += 0x2000;
-  sclLo();
-  sclHi();
-  if (digitalRead(_sda_pin) == 1) value += 0x1000;
-  sclLo();
-  sclHi();
-  if (digitalRead(_sda_pin) == 1) value += 0x0800;
-  sclLo();
-  sclHi();
-  if (digitalRead(_sda_pin) == 1) value += 0x0400;
-  sclLo();
-  sclHi();
-  if (digitalRead(_sda_pin) == 1) value += 0x0200;
-  sclLo();
-  sclHi();
-  if (digitalRead(_sda_pin) == 1) value += 0x0100;
-  sclLo();
-  writeAck();
   sclHi();
   if (digitalRead(_sda_pin) == 1) value += 0x80;
   sclLo();
@@ -213,6 +190,31 @@ uint16_t SWI2C::read2Byte() {
   sclLo();
   sclHi();
   if (digitalRead(_sda_pin) == 1) value += 0x01;
+  sclLo();
+  writeAck();
+  sclHi();
+  if (digitalRead(_sda_pin) == 1) value += 0x8000;
+  sclLo();
+  sclHi();
+  if (digitalRead(_sda_pin) == 1) value += 0x4000;
+  sclLo();
+  sclHi();
+  if (digitalRead(_sda_pin) == 1) value += 0x2000;
+  sclLo();
+  sclHi();
+  if (digitalRead(_sda_pin) == 1) value += 0x1000;
+  sclLo();
+  sclHi();
+  if (digitalRead(_sda_pin) == 1) value += 0x0800;
+  sclLo();
+  sclHi();
+  if (digitalRead(_sda_pin) == 1) value += 0x0400;
+  sclLo();
+  sclHi();
+  if (digitalRead(_sda_pin) == 1) value += 0x0200;
+  sclLo();
+  sclHi();
+  if (digitalRead(_sda_pin) == 1) value += 0x0100;
   sclLo();
   return value;
 }
@@ -271,7 +273,7 @@ int SWI2C::read1bFromRegister(int regAddress, uint8_t* data) {
   checkAckBit();
   writeRegister(regAddress);
   checkAckBit();
-  stopBit();
+//  stopBit();
   startBit();
   writeAddress(1); // 1 == Read bit
   checkAckBit();
@@ -287,7 +289,7 @@ int SWI2C::read2bFromRegister(int regAddress, uint16_t* data) {
   checkAckBit();
   writeRegister(regAddress);
   checkAckBit();
-  stopBit();
+//  stopBit();
   startBit();
   writeAddress(1); // 1 == Read bit
   checkAckBit();
