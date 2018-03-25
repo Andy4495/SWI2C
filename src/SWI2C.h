@@ -1,3 +1,11 @@
+/* -----------------------------------------------------------------
+   SWI2C Library
+   https://gitlab.com/Andy4495/SWI2C
+   MIT License
+
+   03/25/2018 - A.T. - Original
+*/
+
 #ifndef SWI2C_H
 #define SWI2C_H
 

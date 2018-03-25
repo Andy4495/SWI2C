@@ -1,77 +1,115 @@
 SWI2C Library
 ====================
 
-This Energia library provides simple, easy-to-use functions to return the
-calibrated internal temperature and Vcc level on supported MSP430 processor types.
+This library implements a software (bit-bang) I2C interface. It was written without any platform-specific code, and should therefore work on any controller platform supported by the Arduino or Energia IDEs.
 
-Needed this library particularly for the MSP430G2 and FR4133 variants in cases where I needed both SPI and I2C peripherals. The G2 and FR4133 have a single serial controller module (USCI???) which shares the I2C and SPI signals on the same pins.
-
-However, this library was written without any platform-specific code, and should therefore work on any hardware supported by the Arduino or Energia IDE.
-
-Is not a drop-in replacement for Wire (which has its own shortcomings). Therefore need to write your own code for modules that need to use this library. However, the interface is kept simple while still providing low-level signaling functionality to allow tailoring to your specific application.
-
-Clock speed of approximately .... MHz when using the ... MHz clock.
-- Add a scope trace showing SDA/SCK signalling.
-
-Shortcomings of other libraries:
-- Hardcoded delays
-   - Should not be necessary at the "slow" signaling speeds inherent in a software solution
+The MSP430G2 and MSP430FR4133 LaunchPads do not support using both hardware SPI and hardware I2C at the same time. This became a roadblock in one of my projects as I needed to use both types of interfaces for the devices I was using. I tried several different software I2C libraries, but each one that I tried had a shortcoming that was not acceptable for my application:
+-  Hardcoded delays
+   - Hardcoded delays should not be necessary at the "slow" signaling speeds inherent in a software-based I2C solution
 - Lack of or incorrect support of clock stretching
-- Improper pin mode settings for "HIGH" value
-  - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in "INPUT" mode, which effectively disconnects the signal from the I2C bus (a High Impedance state) allows the pull-ups to indicate the high level.
+- Improper pin mode settings for indicating a "HIGH" value on SCL or SCK
+  - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in "INPUT" mode, which effectively disconnects the signal from the I2C bus allows the pull-ups to drive the high level.
 
-Future Updates
---------------
-Error checking
-Generic size of read/write data bytes
-Choosing MSByte or LSByte first in multi-bute data read/write
+This library implements the I2C protocol without using any hardcoded delays, properly supports clock-stretching, and uses INPUT mode for a HIGH level.
 
+This library is not a drop-in replacement for Wire. You will therefore need to write your own code for modules that need to use this library. However, the interface is kept simple while still providing low-level signaling functionality to allow tailoring to your specific application.
+
+Since this is a software-based implementation, the clock speed is significantly reduced compared to a hardware-based I2C controller. Expect a clock speed of about 25 KHz when using an 8 MHz controller.
 
 Usage
 -----
 
-Include the library header file:
+*Be sure to review the example sketch included with the library. *
+
+First, **include** the library header file:
 
     #include "SWI2C.h"
 
-Instantiate an object for each I2C device using SWI2C. The device address and I2C pins are defined in the object constructor, so you need a separate object for each device.
+Next, **instantiate** an object for each I2C device using SWI2C. The device address and I2C pins are defined in the object constructor, so you need a separate object for each device. Note that this is different from the way that the Wire library operates.
 
-    SWI2C myDevice;
+`sda_pin` is the pin number for the SDA signal, `scl_pin` is the pin number for the SCL signal, and `deviceID` is the 7-bit device address of the I2C device represented by this object instance. `deviceID` does *not* include the read/write bit.
 
-Write Data:
+    SWI2C myDevice(uint8_t sda_pin, uint8_t scl_pin, uint8_t deviceID;
 
-    myDevice.write(parameters,....);
-        - Description...
+Initialize the hardware before using the I2C device:
 
-Read Data:
+    myDevice.begin();
 
-    TempF = myMspTemp.getTempCalibratedF();
+*** High Level Library Methods ***
 
+The following library functions are used to read and write data to the device:
 
-Lower Level Functions
----------------------
-Although most I2C communication can be done with the above `read()` and `write()` methods, there may be times where more direct control of the protocol is required. The following methods are also available:
+    int myDevice.writeToRegister(int regAddress, uint8_t data);
 
-   m1();
-   m2();
-   ... etc...
+Writes an 8-bit `data` value to device register `regAddress`. The function always returns `1`.
+
+    int myDevice.read1bFromRegister(int regAddress, uint8_t* data);
+
+Reads 8-bit value from register address `regAddress` into the location pointed to by `data`. The function always returns 1.
+
+    int myDevice.read2bFromRegister(int regAddress, uint16_t* data);
+
+Reads 16-bit value from register address `regAddress` into the location pointed to by `data`. The function always returns 1. This function assumes that the first byte received is the least significant byte.
+
+*** Lower Level Methods ***
+
+Although general I2C communication can be done with the above `readFrom` and `writeTo` methods, there may be times where more direct control of the protocol is required. The following public methods are also available in the SWI2C class:
+
+    void sclHi();
+    void sclLo();
+    void sdaHi();
+    void sdaLo();
+
+The above functions are self-explanatory -- they set the SCL or SCK lines HIGH or LOW.
+
+    void startBit();
+Signals a START bit on the I2C bus.
+
+    void writeAddress(int r_w);
+Writes the 7-bit device address along with either a read (1) or write (0) bit, for a total of 8 bits.
+
+    uint8_t checkAckBit();
+Returns the value of the ACK bit received (either 1 or 0). This function is also used to send a NACK from the master when reading the last byte from the slave device.
+
+    void writeAck();
+Writes an ACK bit -- used by the master between bytes of a multi-byte read operation. The final byte is indicated by an ACK from the master (see `checkAckBit()` above).
+
+    void writeRegister(int regAddress);
+Writes the 8-bit `regAddress` value to the SDA bus.
+
+    void stopBit();
+Signals a STOP bit on the I2C bus.
+
+    uint8_t read1Byte();
+Returns an 8-bit value read from the I2C bus.
+
+    uint16_t read2Byte();
+Returns a 16-bit value read from the I2C bus. This first byte received is assumed to be the least significant byte.
+
+    void writeByte(int data);
+Writes an 8-bit `data` value to the I2C bus.
 
 Implementation Details
 ----------------------
 
-The library ............
+The library does not use any platform-specific code. All I/O functions use standard Arduino `pinMode()`, `digitalRead()`, and `digitalWrite()` functions. Reading and writing to the I2C device is accomplished by stringing together the basic signaling specified in the protocol.
 
-Busy Waits and Delays
----------------------
+There are no hardcoded delays in the code. In order to support clock-stretching, there is a busy-wait loop in the `sclHi()` method which waits until the SCL line actually goes high before exiting the function. This could potentially cause the library to "lock up" if the I2C device does not properly release the SCL line.
 
-Explain where they are, and how they can be improved.
-sclHi() function: waits until line actually goes high before returning (clock stretching)
+*** Future Updates ***
+
+Future potential library updates:
+- Additional error checking
+- Generic size of read/write data bytes
+  - This is currently possible using the lower-level functions contained in the library. A future update may include a single-function-call method in addition to the current single and 2-byte data reads
+- Choosing MSByte or LSByte first in multi-bute data read/write
+  - The library currently assumes that the first byte read in a two-byte read is the least significant byte
+- Timeout for clock stretching to protect against an errant device holding SCL for too long
 
 
 References
 ---------------------
 
-+ NXP [I2C Bus Specification and User Manual] (https://www.nxp.com/docs/en/user-guide/UM10204.pdf)
-Texas Instruments I2C [Application Report] (http://www.ti.com/lit/an/slva704/slva704.pdf)
-+ Clock Stretching https://www.i2c-bus.org/clock-stretching/
-+ Reference related to using INPUT mode for "HIGH" value and high-impedance state
++ NXP [I2C Bus Specification and User Manual](https://www.nxp.com/docs/en/user-guide/UM10204.pdf)
++ Texas Instruments [I2C Application Report](http://www.ti.com/lit/an/slva704/slva704.pdf)
++ [Clock Stretching](https://www.i2c-bus.org/clock-stretching/)
