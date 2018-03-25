@@ -19,7 +19,7 @@ Since this is a software-based implementation, the clock speed is significantly 
 Usage
 -----
 
-*Be sure to review the example sketch included with the library. *
+_Be sure to review the example sketch included with the library._
 
 First, **include** the library header file:
 
@@ -31,17 +31,17 @@ Next, **instantiate** an object for each I2C device using SWI2C. The device addr
 
     SWI2C myDevice(uint8_t sda_pin, uint8_t scl_pin, uint8_t deviceID;
 
-Initialize the hardware before using the I2C device:
+Then, **initialize** the hardware before using the I2C device:
 
     myDevice.begin();
 
-*** High Level Library Methods ***
+#### High Level Library Methods ####
 
 The following library functions are used to read and write data to the device:
 
     int myDevice.writeToRegister(int regAddress, uint8_t data);
 
-Writes an 8-bit `data` value to device register `regAddress`. The function always returns `1`.
+Writes an 8-bit `data` value to device register `regAddress`. The function always returns 1.
 
     int myDevice.read1bFromRegister(int regAddress, uint8_t* data);
 
@@ -51,7 +51,7 @@ Reads 8-bit value from register address `regAddress` into the location pointed t
 
 Reads 16-bit value from register address `regAddress` into the location pointed to by `data`. The function always returns 1. This function assumes that the first byte received is the least significant byte.
 
-*** Lower Level Methods ***
+#### Lower Level Methods ####
 
 Although general I2C communication can be done with the above `readFrom` and `writeTo` methods, there may be times where more direct control of the protocol is required. The following public methods are also available in the SWI2C class:
 
@@ -92,11 +92,11 @@ Writes an 8-bit `data` value to the I2C bus.
 Implementation Details
 ----------------------
 
-The library does not use any platform-specific code. All I/O functions use standard Arduino `pinMode()`, `digitalRead()`, and `digitalWrite()` functions. Reading and writing to the I2C device is accomplished by stringing together the basic signaling specified in the protocol.
+The library does not use any platform-specific code. All I/O functions use standard Arduino `pinMode()`, `digitalRead()`, and `digitalWrite()` functions. Reading and writing to the I2C device is accomplished by stringing together the basic signaling primitives specified by the protocol.
 
 There are no hardcoded delays in the code. In order to support clock-stretching, there is a busy-wait loop in the `sclHi()` method which waits until the SCL line actually goes high before exiting the function. This could potentially cause the library to "lock up" if the I2C device does not properly release the SCL line.
 
-*** Future Updates ***
+#### Future Updates ####
 
 Future potential library updates:
 - Additional error checking
