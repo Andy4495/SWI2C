@@ -8,7 +8,7 @@ The MSP430G2 and MSP430FR4133 LaunchPads do not support using both hardware SPI 
    - Hardcoded delays should not be necessary at the "slow" signaling speeds inherent in a software-based I2C solution
 - Lack of or incorrect support of clock stretching
 - Improper pin mode settings for indicating a "HIGH" value on SCL or SCK
-  - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in "INPUT" mode, which effectively disconnects the signal from the I2C bus allows the pull-ups to drive the high level.
+  - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in `INPUT` mode. `INPUT` mode disconnects the signal from the I2C bus and allows the pull-ups to drive the high level.
 
 This library implements the I2C protocol without using any hardcoded delays, properly supports clock-stretching, and uses INPUT mode for a HIGH level.
 
@@ -29,7 +29,7 @@ Next, **instantiate** an object for each I2C device using SWI2C. The device addr
 
 `sda_pin` is the pin number for the SDA signal, `scl_pin` is the pin number for the SCL signal, and `deviceID` is the 7-bit device address of the I2C device represented by this object instance. `deviceID` does *not* include the read/write bit.
 
-    SWI2C myDevice(uint8_t sda_pin, uint8_t scl_pin, uint8_t deviceID;
+    SWI2C myDevice(uint8_t sda_pin, uint8_t scl_pin, uint8_t deviceID);
 
 Then, **initialize** the hardware before using the I2C device:
 
