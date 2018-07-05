@@ -4,6 +4,7 @@
    MIT License
 
    03/25/2018 - A.T. - Original
+   07/04/2018 - A.T. - Add timeout for clock stretching
 */
 
 #include "SWI2C.h"
@@ -12,6 +13,8 @@ SWI2C::SWI2C(uint8_t sda_pin, uint8_t scl_pin, uint8_t deviceID) {
   _sda_pin = sda_pin;
   _scl_pin = scl_pin;
   _deviceID = deviceID;
+  _stretch_timeout_delay = DEFAULT_STRETCH_TIMEOUT;
+  _stretch_timeout_error = 0;
 }
 
 void SWI2C::begin() {
@@ -24,28 +27,61 @@ void SWI2C::begin() {
 }
 
 void SWI2C::sclHi() {
-  pinMode(_scl_pin, INPUT);         // Pull-up resistor pulls SCL high in Hi-Z mode
+  unsigned long startTimer;
+
+ // I2C pull-up resistor pulls SCL high in INPUT (Hi-Z) mode
+  pinMode(_scl_pin, INPUT);
+
   // Check to make sure SCL pin has actually gone high before returning
   // Slave may be pulling SCL low to delay transfer (clock stretching)
-  while (digitalRead(_scl_pin) == LOW);
+
+  if ( _stretch_timeout_delay == 0) { // If timeout delay == 0, then wait indefinitely for SCL to go high
+    while (digitalRead(_scl_pin) == LOW) ;  // Empty statement: keep looping until not LOW
+  }
+  else {
+    // If SCL is not pulled high within a timeout period, then return anyway
+    // to avoid locking up the processor.
+    startTimer = millis();
+    while (millis() - startTimer < _stretch_timeout_delay) {
+      if (digitalRead(_scl_pin) == HIGH) return; // SCL high before timeout, return without error
+    }
+    // SCL did not go high within the timeout, so set error and return anyway.
+    _stretch_timeout_error = 1;
+  }
 }
 
 void SWI2C::sclLo() {
-  pinMode(_scl_pin, OUTPUT);        // _scl_pin set LOW in constructor
+  pinMode(_scl_pin, OUTPUT);  // _scl_pin set LOW in constructor
 }
 
 void SWI2C::sdaHi() {
-  pinMode(_sda_pin, INPUT);
+  pinMode(_sda_pin, INPUT);  // I2C pull-up resistor pulls signal high
 }
 
 void SWI2C::sdaLo() {
-  pinMode(_sda_pin, OUTPUT);        // _sda_pin set LOW in constructor
+  pinMode(_sda_pin, OUTPUT); // _sda_pin set LOW in constructor
 }
 
 void SWI2C::startBit() {  // Assume SDA already HIGH
   sclHi();
   sdaLo();
   sclLo();
+}
+
+unsigned long SWI2C::getStretchTimeout() {
+  return _stretch_timeout_delay;
+}
+
+void SWI2C::setStretchTimeout(unsigned long t) {
+  _stretch_timeout_delay = t;
+}
+
+int SWI2C::checkStretchTimeout(){
+  int retval;
+  retval = _stretch_timeout_error;
+  // Clear the value upon reading it.
+  _stretch_timeout_error = 0;
+  return retval;
 }
 
 void SWI2C::writeAddress(int r_w) {  // Assume SCL, SDA already LOW from startBit()

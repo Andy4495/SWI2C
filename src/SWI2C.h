@@ -4,6 +4,8 @@
    MIT License
 
    03/25/2018 - A.T. - Original
+   07/04/2018 - A.T. - Add timeout for clock stretching
+
 */
 
 #ifndef SWI2C_H
@@ -31,10 +33,16 @@ public:
   uint8_t read1Byte();
   uint16_t read2Byte();
   void writeByte(int data);
+  unsigned long getStretchTimeout();
+  void setStretchTimeout(unsigned long t);
+  int checkStretchTimeout();
 private:
+  enum {DEFAULT_STRETCH_TIMEOUT = 500UL};   // ms timeout waiting for device to release SCL line
   uint8_t _deviceID;
   uint8_t _scl_pin;
   uint8_t _sda_pin;
+  unsigned long _stretch_timeout_delay;
+  int _stretch_timeout_error;
 };
 
 #endif

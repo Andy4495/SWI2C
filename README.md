@@ -90,12 +90,21 @@ Returns a 16-bit value read from the I2C bus. This first byte received is assume
     void writeByte(int data);
 Writes an 8-bit `data` value to the I2C bus.
 
+    void setStretchTimeout(unsigned long t);
+Sets the clock stretching timeout to `t` milliseconds. The default timeout is 500 ms when the SWI2C object is created. If the timeout value is set to zero, then the library will wait indefinitely for the clock to be released by the device.
+
+    unsigned long getStretchTimeout();
+Read the current clock stretching timeout value.
+
+    unsigned long checkStretchTimeout();
+Check if a previous clock operation resulted in a timeout. Returns non-zero if the timeout was reached waiting for the SCL line to go high. The error will remain set internally until this function is called. Reading the value (by calling this function) clears the error.
+
 Implementation Details
 ----------------------
 
 The library does not use any platform-specific code. All I/O functions use standard Arduino `pinMode()`, `digitalRead()`, and `digitalWrite()` functions. Reading and writing to the I2C device is accomplished by stringing together the basic signaling primitives specified by the protocol.
 
-There are no hardcoded delays in the code. In order to support clock-stretching, there is a busy-wait loop in the `sclHi()` method which waits until the SCL line actually goes high before exiting the function. This could potentially cause the library to "lock up" if the I2C device does not properly release the SCL line.
+There are no hardcoded delays in the code. In order to support clock-stretching, there is a busy-wait loop in the `sclHi()` method which waits until the SCL line actually goes high before exiting the function. There is a default timeout of 500 ms before the wait times out and the function returns. This delay can be changed on a per-device basis (`setStretchTimeout()`). It can also be set to zero if no timeout is desired (which could potentially cause the library to "lock up" if the I2C device does not properly release the SCL line).
 
 #### Future Updates ####
 
@@ -105,8 +114,6 @@ Future potential library updates:
   - This is currently possible using the lower-level functions contained in the library. A future update may include a single-function-call method in addition to the current single and 2-byte data reads
 - Choosing MSByte or LSByte first in multi-bute data read/write
   - The library currently assumes that the first byte read in a two-byte read is the least significant byte
-- Timeout for clock stretching to protect against an errant device holding SCL for too long
-
 
 References
 ---------------------
