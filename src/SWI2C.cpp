@@ -5,6 +5,8 @@
 
    03/25/2018 - A.T. - Original
    07/04/2018 - A.T. - Add timeout for clock stretching
+   10/17/2018 - A.T. - Add 2-byte write method and methods to swap MSB/LSB
+                       for 2-byte reads and writes.
 */
 
 #include "SWI2C.h"
@@ -137,39 +139,7 @@ void SWI2C::writeAck() {  // Used by Master to ACK to slave bewteen multi-byte r
 }
 
 void SWI2C::writeRegister(int reg_id) {
-  if (reg_id & 0x80) sdaHi();     // bit 7
-  else sdaLo();
-  sclHi();
-  sclLo();
-  if (reg_id & 0x40) sdaHi();     // bit 6
-  else sdaLo();
-  sclHi();
-  sclLo();
-  if (reg_id & 0x20) sdaHi();     // bit 5
-  else sdaLo();
-  sclHi();
-  sclLo();
-  if (reg_id & 0x10) sdaHi();     // bit 4
-  else sdaLo();
-  sclHi();
-  sclLo();
-  if (reg_id & 0x08) sdaHi();     // bit 3
-  else sdaLo();
-  sclHi();
-  sclLo();
-  if (reg_id & 0x04) sdaHi();     // bit 2
-  else sdaLo();
-  sclHi();
-  sclLo();
-  if (reg_id & 0x02) sdaHi();     // bit 1
-  else sdaLo();
-  sclHi();
-  sclLo();
-  if (reg_id & 0x01) sdaHi();     // bit 0
-  else sdaLo();
-  sclHi();
-  sclLo();
-  sdaHi();  // Release the data line for ACK from slave
+  writeByte(reg_id);
 }
 
 void SWI2C::stopBit() {  // Assume SCK is already LOW (from ack or data write)
@@ -299,13 +269,39 @@ void SWI2C::writeByte(int data) {
   sdaHi();  // Release the data line for ACK from slave
 }
 
+// New method for name consistency, keep the old method for backward compatibility
+int SWI2C::write1bToRegister(int regAddress, uint8_t data) {
+  writeToRegister(regAddress, data);
+}
+
+int SWI2C::write2bToRegister(int regAddress, uint16_t data) {
+  // LEAST significant BYTE is transferred first
+  // If device is expecting MSB first, use write2bToRegisterMSBFirst()
+  startBit();
+  writeAddress(0);
+  checkAckBit();
+  writeRegister(regAddress);
+  checkAckBit();
+  writeByte(data & 0xFF); // LSB
+  checkAckBit();
+  writeByte(data >> 8);   // MSB
+  checkAckBit();
+  stopBit();
+  return 1;       // Future support for error checking
+}
+
+int SWI2C::write2bToRegisterMSBFirst(int regAddress, uint16_t data) {
+  // Swaps MSB and LSB
+  write2bToRegister(regAddress, ((data & 0xFF00) >> 8) | ((data & 0xFF) << 8));
+}
+
 int SWI2C::writeToRegister(int regAddress, uint8_t data) {
   startBit();
   writeAddress(0);
   checkAckBit();
-  writeRegister(regAddress); // DRCFG register
+  writeRegister(regAddress);
   checkAckBit();
-  writeByte(data);   // Clear register; turn off DR
+  writeByte(data);
   checkAckBit();
   stopBit();
   return 1;       // Future support for error checking
@@ -328,6 +324,7 @@ int SWI2C::read1bFromRegister(int regAddress, uint8_t* data) {
 }
 
 int SWI2C::read2bFromRegister(int regAddress, uint16_t* data) {
+  // Returns first byte received in LSB. If MSB is first, then use read2bFromRegisterMSBFirst()
   startBit();
   writeAddress(0); // 0 == Write bit
   checkAckBit();
@@ -337,10 +334,15 @@ int SWI2C::read2bFromRegister(int regAddress, uint16_t* data) {
   startBit();
   writeAddress(1); // 1 == Read bit
   checkAckBit();
-  *data = read2Byte();
+  *data = read2Byte(); // Assumes LSB received first
   checkAckBit(); // Master needs to send NACK when done reading data
   stopBit();
   return 1;    // Future support for error checking
+}
+
+int SWI2C::read2bFromRegisterMSBFirst(int regAddress, uint16_t* data) {
+  read2bFromRegister(regAddress, data);
+  *data = ((*data & 0xFF00) >> 8) | ((*data & 0xFF) << 8);
 }
 
 // Need 16-bit (or variable-size) read and write functions

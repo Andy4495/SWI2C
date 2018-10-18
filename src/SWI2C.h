@@ -5,6 +5,7 @@
 
    03/25/2018 - A.T. - Original
    07/04/2018 - A.T. - Add timeout for clock stretching
+   10/17/2018 - A.T. - Add 2-byte write method
 
 */
 
@@ -17,9 +18,13 @@ class SWI2C {
 public:
   SWI2C(uint8_t sda_pin, uint8_t scl_pin, uint8_t deviceID);
   void begin();
+  int write1bToRegister(int regAddress, uint8_t data);
+  int write2bToRegister(int regAddress, uint16_t data);
+  int write2bToRegisterMSBFirst(int regAddress, uint16_t data) ;
   int writeToRegister(int regAddress, uint8_t data);
   int read1bFromRegister(int regAddress, uint8_t* data);
   int read2bFromRegister(int regAddress, uint16_t* data);
+  int read2bFromRegisterMSBFirst(int regAddress, uint16_t* data);
   void sclHi();
   void sclLo();
   void sdaHi();

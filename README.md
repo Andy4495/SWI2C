@@ -44,6 +44,14 @@ The following library functions are used to read and write data to the device:
 
 Writes an 8-bit `data` value to device register `regAddress`. The function always returns 1.
 
+    int myDevice.write2bToRegister(int regAddress, uint16_t data);
+
+Writes a 16-bit `data` value to device register `regAddress`. The first byte written is the least signifcant byte of `data`. The function always returns 1.
+
+    int myDevice.write2bToRegisterMSBFirst(int regAddress, uint16_t data);
+
+Same as `write2bToRegister()`, except that the first byte written is the most signifcant byte of `data`. The function always returns 1.
+
     int myDevice.read1bFromRegister(int regAddress, uint8_t* data);
 
 Reads 8-bit value from register address `regAddress` into the location pointed to by `data`. The function always returns 1.
@@ -51,6 +59,10 @@ Reads 8-bit value from register address `regAddress` into the location pointed t
     int myDevice.read2bFromRegister(int regAddress, uint16_t* data);
 
 Reads 16-bit value from register address `regAddress` into the location pointed to by `data`. The function always returns 1. This function assumes that the first byte received is the least significant byte.
+
+    int myDevice.read2bFromRegisterMSBFirst(int regAddress, uint16_t* data);
+
+Same as `read2bFromRegister()`, except the first byte received is the most significant byte.
 
 #### Lower Level Methods ####
 
@@ -111,9 +123,8 @@ There are no hardcoded delays in the code. In order to support clock-stretching,
 Future potential library updates:
 - Additional error checking
 - Generic size of read/write data bytes
-  - This is currently possible using the lower-level functions contained in the library. A future update may include a single-function-call method in addition to the current single and 2-byte data reads
-- Choosing MSByte or LSByte first in multi-bute data read/write
-  - The library currently assumes that the first byte read in a two-byte read is the least significant byte
+  - This is currently possible using the lower-level functions contained in the library. A future update may include a single-function-call method in addition to the current single and 2-byte data reads and writes.
+
 
 References
 ---------------------
