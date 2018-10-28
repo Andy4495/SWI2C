@@ -345,4 +345,32 @@ int SWI2C::read2bFromRegisterMSBFirst(int regAddress, uint16_t* data) {
   *data = ((*data & 0xFF00) >> 8) | ((*data & 0xFF) << 8);
 }
 
+int SWI2C::readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count) {
+  // Reads <count> bytes after sending device address and register address.
+  // Bytes are returned in <data>, which is assumed to be at least <count> bytes in size.
+  startBit();
+  writeAddress(0); // 0 == Write bit
+  checkAckBit();
+  writeRegister(regAddress);
+  checkAckBit();
+  //  stopBit();
+  startBit();
+  writeAddress(1); // 1 == Read bit
+  checkAckBit();
+  // Loop 8 bytes
+  for (int i = 0; i < count; i++) {
+    data[i] = read1Byte();
+    if (i < (count-1)) {
+      writeAck();
+    }
+    else { // Last byte needs a NACK
+      checkAckBit(); // Master needs to send NACK when done reading data
+    }
+  }
+  stopBit();
+
+  return 1; // Future support for error checking
+}
+
+
 // Need 16-bit (or variable-size) read and write functions

@@ -64,6 +64,10 @@ Reads 16-bit value from register address `regAddress` into the location pointed 
 
 Same as `read2bFromRegister()`, except the first byte received is the most significant byte.
 
+    readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count);
+
+Reads `count` number of bytes from from register address `regAddress` into `data`. `data` must defined to have at least `count` elements. Bytes received are placed in `data` LSB first (i.e., the first byte received is put in data[0], second byte is data[1], etc.).
+
 #### Lower Level Methods ####
 
 Although general I2C communication can be done with the above `readFrom` and `writeTo` methods, there may be times where more direct control of the protocol is required. The following public methods are also available in the SWI2C class:

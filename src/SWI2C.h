@@ -25,6 +25,7 @@ public:
   int read1bFromRegister(int regAddress, uint8_t* data);
   int read2bFromRegister(int regAddress, uint16_t* data);
   int read2bFromRegisterMSBFirst(int regAddress, uint16_t* data);
+  int readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count);
   void sclHi();
   void sclLo();
   void sdaHi();
