@@ -1,6 +1,6 @@
 /* -----------------------------------------------------------------
    SWI2C Library
-   https://gitlab.com/Andy4495/SWI2C
+   https://github.com/Andy4495/SWI2C
    MIT License
 
    03/25/2018 - A.T. - Original

@@ -1,6 +1,6 @@
 /* -----------------------------------------------------------------
    SWI2C Library Example Sketch
-   https://gitlab.com/Andy4495/SWI2C
+   https://github.com/Andy4495/SWI2C
    MIT License
 
    03/25/2018 - A.T. - Original
@@ -13,8 +13,8 @@
 */
 #include "SWI2C.h"
 
-#define SCL_PIN 9 
-#define SDA_PIN 10 
+#define SCL_PIN 9
+#define SDA_PIN 10
 
 // Constants
 const uint8_t ZX_ADDR = 0x10;  // ZX Sensor I2C address
