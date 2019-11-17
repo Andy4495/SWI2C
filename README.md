@@ -66,7 +66,8 @@ Same as `read2bFromRegister()`, except the first byte received is the most signi
 
     readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count);
 
-Reads `count` number of bytes from from register address `regAddress` into `data`. `data` must defined to have at least `count` elements. Bytes received are placed in `data` LSB first (i.e., the first byte received is put in data[0], second byte is data[1], etc.).
+Reads `count` number of bytes from from register address `regAddress` into `data`. **`data` must defined to have at least `count` elements.**
+Bytes received are placed in `data` LSB first (i.e., the first byte received is put in data[0], second byte is data[1], etc.).
 
 #### Lower Level Methods ####
 
@@ -126,8 +127,8 @@ There are no hardcoded delays in the code. In order to support clock-stretching,
 
 Future potential library updates:
 - Additional error checking
-- Generic size of read/write data bytes
-  - This is currently possible using the lower-level functions contained in the library. A future update may include a single-function-call method in addition to the current single and 2-byte data reads and writes.
+- Generic size of write data bytes
+  - This is currently possible using the lower-level functions contained in the library. A future update may include a single-function-call method in addition to the current single and 2-byte data writes.
 
 
 References
