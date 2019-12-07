@@ -9,7 +9,7 @@ The MSP430G2 and MSP430FR4133 LaunchPads do not support using both hardware SPI 
 - Lack of or incorrect support of clock stretching
 - Improper pin mode settings for indicating a "HIGH" value on SCL or SDA
   - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in `INPUT` mode. `INPUT` mode does not drive the bus high or low,  and allows the pull-ups to assert the high level.
-  - Note that internal protection diodes on the input pins will clamp the signal line to a max of about 0.5 V above the chip's Vcc level. In other words, you cannot use `INPUT` mode to deal with voltage level differences between chips. Level-shifting circuitry is required to support mixing 5V and 3.3V logic. 
+  - Note that internal protection diodes on the input pins will clamp the signal line to a max of about 0.5 V above the chip's Vcc level. In other words, you cannot use `INPUT` mode to deal with voltage level differences between chips. Level-shifting circuitry is required to support mixing 5V and 3.3V logic.
 
 This library implements the I2C protocol without using any hardcoded delays, properly supports clock-stretching, and uses INPUT mode for a HIGH level.
 
@@ -51,6 +51,10 @@ Writes a 16-bit `data` value to device register `regAddress`. The first byte wri
     int myDevice.write2bToRegisterMSBFirst(int regAddress, uint16_t data);
 
 Same as `write2bToRegister()`, except that the first byte written is the most signifcant byte of `data`. The function always returns 1.
+
+    int myDevice.writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count)
+
+Writes `count` butes from `data` to register address `regAddress`.
 
     int myDevice.read1bFromRegister(int regAddress, uint8_t* data);
 
@@ -127,9 +131,6 @@ There are no hardcoded delays in the code. In order to support clock-stretching,
 
 Future potential library updates:
 - Additional error checking
-- Generic size of write data bytes
-  - This is currently possible using the lower-level functions contained in the library. A future update may include a single-function-call method in addition to the current single and 2-byte data writes.
-
 
 References
 ---------------------

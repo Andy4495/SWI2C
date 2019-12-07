@@ -357,7 +357,7 @@ int SWI2C::readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count) {
   startBit();
   writeAddress(1); // 1 == Read bit
   checkAckBit();
-  // Loop 8 bytes
+  // Loop data bytes
   for (int i = 0; i < count; i++) {
     data[i] = read1Byte();
     if (i < (count-1)) {
@@ -372,5 +372,19 @@ int SWI2C::readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count) {
   return 1; // Future support for error checking
 }
 
-
-// Need 16-bit (or variable-size) read and write functions
+int SWI2C::writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count) {
+  // Writes <count> bytes after sending device address and register address.
+  // Least significant byte is written first, ie. data[0] sent first
+  startBit();
+  writeAddress(0);
+  checkAckBit();
+  writeRegister(regAddress);
+  checkAckBit();
+  // Loop data bytes
+  for (int i = 0; i < count; i++) {
+    writeByte(data[i] & 0xFF); // LSB
+    checkAckBit();
+  }
+  stopBit();
+  return 1;       // Future support for error checking
+}

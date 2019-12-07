@@ -22,6 +22,7 @@ public:
   int write2bToRegister(int regAddress, uint16_t data);
   int write2bToRegisterMSBFirst(int regAddress, uint16_t data) ;
   int writeToRegister(int regAddress, uint8_t data);
+  int writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count);
   int read1bFromRegister(int regAddress, uint8_t* data);
   int read2bFromRegister(int regAddress, uint16_t* data);
   int read2bFromRegisterMSBFirst(int regAddress, uint16_t* data);
