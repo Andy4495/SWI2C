@@ -54,7 +54,7 @@ Same as `write2bToRegister()`, except that the first byte written is the most si
 
     int myDevice.writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count)
 
-Writes `count` butes from `data` to register address `regAddress`.
+Writes `count` bytes from `data` to register address `regAddress`.
 
     int myDevice.read1bFromRegister(int regAddress, uint8_t* data);
 
