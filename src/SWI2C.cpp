@@ -35,7 +35,7 @@ void SWI2C::sclHi() {
   pinMode(_scl_pin, INPUT);
 
   // Check to make sure SCL pin has actually gone high before returning
-  // Slave may be pulling SCL low to delay transfer (clock stretching)
+  // Device may be pulling SCL low to delay transfer (clock stretching)
 
   if ( _stretch_timeout_delay == 0) { // If timeout delay == 0, then wait indefinitely for SCL to go high
     while (digitalRead(_scl_pin) == LOW) ;  // Empty statement: keep looping until not LOW
@@ -119,19 +119,19 @@ void SWI2C::writeAddress(int r_w) {  // Assume SCL, SDA already LOW from startBi
   else sdaLo();
   sclHi();
   sclLo();
-  sdaHi();    // Release the data line for ACK signal from slave
+  sdaHi();    // Release the data line for ACK signal from device
 }
 
-uint8_t SWI2C::checkAckBit() { // Can also be used by master to send NACK after last byte is read from slave
+uint8_t SWI2C::checkAckBit() { // Can also be used by controller to send NACK after last byte is read from device
   uint8_t ack;
-  sdaHi();    // Release data line. This will cause a NACK from master when reading bytes.
+  sdaHi();    // Release data line. This will cause a NACK from controller when reading bytes.
   sclHi();
   ack = digitalRead(_sda_pin);
   sclLo();
   return ack;
 }
 
-void SWI2C::writeAck() {  // Used by Master to ACK to slave bewteen multi-byte reads
+void SWI2C::writeAck() {  // Used by controller to ACK to device bewteen multi-byte reads
   sdaLo();
   sclHi();
   sclLo();
@@ -266,7 +266,7 @@ void SWI2C::writeByte(int data) {
   else sdaLo();
   sclHi();
   sclLo();
-  sdaHi();  // Release the data line for ACK from slave
+  sdaHi();  // Release the data line for ACK from device
 }
 
 // New method for name consistency, keep the old method for backward compatibility
@@ -318,7 +318,7 @@ int SWI2C::read1bFromRegister(int regAddress, uint8_t* data) {
   writeAddress(1); // 1 == Read bit
   checkAckBit();
   *data = read1Byte();
-  checkAckBit(); // Master needs to send NACK when done reading data
+  checkAckBit(); // Controller needs to send NACK when done reading data
   stopBit();
   return 1;    // Future support for error checking
 }
@@ -335,7 +335,7 @@ int SWI2C::read2bFromRegister(int regAddress, uint16_t* data) {
   writeAddress(1); // 1 == Read bit
   checkAckBit();
   *data = read2Byte(); // Assumes LSB received first
-  checkAckBit(); // Master needs to send NACK when done reading data
+  checkAckBit(); // Controller needs to send NACK when done reading data
   stopBit();
   return 1;    // Future support for error checking
 }
@@ -364,7 +364,7 @@ int SWI2C::readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count) {
       writeAck();
     }
     else { // Last byte needs a NACK
-      checkAckBit(); // Master needs to send NACK when done reading data
+      checkAckBit(); // Controller needs to send NACK when done reading data
     }
   }
   stopBit();

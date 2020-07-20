@@ -1,7 +1,7 @@
 SWI2C Library
 ====================
 
-This library implements a software (bit-bang) I2C interface. It was written without any platform-specific code, and should therefore work on any controller platform supported by the Arduino or Energia IDEs.
+This library implements a software (bit-bang) I2C interface. It was written without any platform-specific code, and should therefore work on any platform supported by the Arduino or Energia IDEs.
 
 The MSP430G2 and MSP430FR4133 LaunchPads do not support using both hardware SPI and hardware I2C at the same time. This became a roadblock in one of my projects as I needed to use both types of interfaces for the devices I was using. I tried several different software I2C libraries, but each one that I tried had a shortcoming that was not acceptable for my application:
 -  Hardcoded delays
@@ -11,11 +11,11 @@ The MSP430G2 and MSP430FR4133 LaunchPads do not support using both hardware SPI 
   - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in `INPUT` mode. `INPUT` mode does not drive the bus high or low,  and allows the pull-ups to assert the high level.
   - Note that internal protection diodes on the input pins will clamp the signal line to a max of about 0.5 V above the chip's Vcc level. In other words, you cannot use `INPUT` mode to deal with voltage level differences between chips. Level-shifting circuitry is required to support mixing 5V and 3.3V logic.
 
-This library implements the I2C protocol without using any hardcoded delays, properly supports clock-stretching, and uses INPUT mode for a HIGH level.
+This library implements the I2C protocol without using any of the above issues.
 
 This library is not a drop-in replacement for Wire. You will therefore need to write your own code for modules that need to use this library. However, the interface is kept simple while still providing low-level signaling functionality to allow tailoring to your specific application.
 
-Since this is a software-based implementation, the clock speed is significantly reduced compared to a hardware-based I2C controller. Expect a clock speed of about 25 KHz when using an 8 MHz controller.
+Since this is a software-based implementation, the clock speed is significantly reduced compared to a hardware-based I2C implementation. Expect a clock speed of about 25 KHz when using an 8 MHz microcontroller.
 
 Usage
 -----
@@ -91,10 +91,10 @@ Signals a START bit on the I2C bus.
 Writes the 7-bit device address along with either a read (1) or write (0) bit, for a total of 8 bits.
 
     uint8_t checkAckBit();
-Returns the value of the ACK bit received (either 1 or 0). This function is also used to send a NACK from the master when reading the last byte from the slave device.
+Returns the value of the ACK bit received (either 1 or 0). This function is also used to send a NACK from the controller device when reading the last byte from the peripheral device.
 
     void writeAck();
-Writes an ACK bit -- used by the master between bytes of a multi-byte read operation. The final byte is indicated by a NACK from the master (see `checkAckBit()` above).
+Writes an ACK bit -- used by the controller device between bytes of a multi-byte read operation. The final byte is indicated by a NACK from the controller device (see `checkAckBit()` above).
 
     void writeRegister(int regAddress);
 Writes the 8-bit `regAddress` value to the SDA bus.
