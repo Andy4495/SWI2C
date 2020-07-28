@@ -11,7 +11,7 @@ The MSP430G2 and MSP430FR4133 LaunchPads do not support using both hardware SPI 
   - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in `INPUT` mode. `INPUT` mode does not drive the bus high or low,  and allows the pull-ups to assert the high level.
   - Note that internal protection diodes on the input pins will clamp the signal line to a max of about 0.5 V above the chip's Vcc level. In other words, you cannot use `INPUT` mode to deal with voltage level differences between chips. Level-shifting circuitry is required to support mixing 5V and 3.3V logic.
 
-This library implements the I2C protocol without using any of the above issues.
+This library implements the I2C protocol without any of the above issues.
 
 This library is not a drop-in replacement for Wire. You will therefore need to write your own code for modules that need to use this library. However, the interface is kept simple while still providing low-level signaling functionality to allow tailoring to your specific application.
 
