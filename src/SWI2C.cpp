@@ -272,6 +272,7 @@ void SWI2C::writeByte(int data) {
 // New method for name consistency, keep the old method for backward compatibility
 int SWI2C::write1bToRegister(int regAddress, uint8_t data) {
   writeToRegister(regAddress, data);
+  return 1;
 }
 
 int SWI2C::write2bToRegister(int regAddress, uint16_t data) {
@@ -292,7 +293,7 @@ int SWI2C::write2bToRegister(int regAddress, uint16_t data) {
 
 int SWI2C::write2bToRegisterMSBFirst(int regAddress, uint16_t data) {
   // Swaps MSB and LSB
-  write2bToRegister(regAddress, ((data & 0xFF00) >> 8) | ((data & 0xFF) << 8));
+  return write2bToRegister(regAddress, ((data & 0xFF00) >> 8) | ((data & 0xFF) << 8));
 }
 
 int SWI2C::writeToRegister(int regAddress, uint8_t data) {
@@ -341,8 +342,10 @@ int SWI2C::read2bFromRegister(int regAddress, uint16_t* data) {
 }
 
 int SWI2C::read2bFromRegisterMSBFirst(int regAddress, uint16_t* data) {
-  read2bFromRegister(regAddress, data);
+  int retval;
+  retval = read2bFromRegister(regAddress, data);
   *data = ((*data & 0xFF00) >> 8) | ((*data & 0xFF) << 8);
+  return retval; 
 }
 
 int SWI2C::readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count) {
