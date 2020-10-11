@@ -5,11 +5,10 @@ This library implements a software (bit-bang) I2C interface. It was written with
 
 The MSP430G2 and MSP430FR4133 LaunchPads do not support using both hardware SPI and hardware I2C at the same time. This became a roadblock in one of my projects as I needed to use both types of interfaces for the devices I was using. I tried several different software I2C libraries, but each one that I tried had a shortcoming that was not acceptable for my application:
 -  Hardcoded delays
-   - Hardcoded delays should not be necessary at the "slow" signaling speeds inherent in a software-based I2C solution
+   - Hardcoded delays should not be necessary at the "slow" signaling speeds inherent in a software-based I2C solution using `digitalWrite()` and `pinMode()` methods.
 - Lack of or incorrect support of clock stretching
-- Improper pin mode settings for indicating a "HIGH" value on SCL or SDA
-  - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in `INPUT` mode. `INPUT` mode does not drive the bus high or low,  and allows the pull-ups to assert the high level.
-  - Note that internal protection diodes on the input pins will clamp the signal line to a max of about 0.5 V above the chip's Vcc level. In other words, you cannot use `INPUT` mode to deal with voltage level differences between chips. Level-shifting circuitry is required to support mixing 5V and 3.3V logic.
+- Incorrectly using `pinMode(HIGH)` for indicating a "HIGH" value on SCL or SDA
+  - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in `INPUT` mode. `INPUT` mode does not drive the bus high or low,  and allows the external pull-ups to assert the high level.
 
 This library implements the I2C protocol without any of the above issues.
 
