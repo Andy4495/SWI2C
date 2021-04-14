@@ -137,3 +137,10 @@ References
 + NXP [I2C Bus Specification and User Manual](https://www.nxp.com/docs/en/user-guide/UM10204.pdf)
 + Texas Instruments [I2C Application Report](http://www.ti.com/lit/an/slva704/slva704.pdf)
 + [Clock Stretching](https://www.i2c-bus.org/clock-stretching/)
+
+License
+-------
+The software and other files in this repository are released under what is commonly called the [MIT License][100]. See the file [`LICENSE`][101] in this repository.
+
+[100]: https://choosealicense.com/licenses/mit/
+[101]: ./LICENSE
