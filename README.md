@@ -83,14 +83,14 @@ The following library methods are used to read and write data to the device. All
 - Same as `read2bFromRegister()`, except the first byte received is the most significant byte:
 
     ```cpp
-    int myDevice.read2bFromRegisterMSBFirst(int regAddress, uint16_t* data_buffer);
+    int myDevice.read2bFromRegisterMSBFirst(int regAddress, uint16_t* data);
     ```
 
 - Read `count` number of bytes from from register address `regAddress` into `data_buffer`. **`data_buffer` must defined to have at least `count` elements.**
 Bytes received are placed in `data_buffer` LSB first (i.e., the first byte received is put in `data_buffer[0]`, second byte is `data_buffer[1]`, etc.):
 
     ```cpp
-    int myDevice.readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count);
+    int myDevice.readBytesFromRegister(int regAddress, uint8_t* data_buffer, uint8_t count);
     ```
 
 ### Lower Level Methods
