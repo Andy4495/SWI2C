@@ -1,6 +1,6 @@
 # SWI2C Library
 
-This library implements a software (bit-bang) I2C interface. It was written without any platform-specific code, and should therefore work on any platform supported by the Arduino or Energia IDEs.
+This library implements a software (bit-bang) I2C controller interface. It was written without any platform-specific code, and should therefore work on any platform supported by the Arduino or Energia IDEs.
 
 The MSP430G2 and MSP430FR4133 LaunchPads do not support using both hardware SPI and hardware I2C at the same time. This became a roadblock in one of my projects as I needed to use both types of interfaces for the devices I was using. I tried several different software I2C libraries, but each one that I tried had a shortcoming that was not acceptable for my application:
 
@@ -18,7 +18,7 @@ Since this is a software-based implementation, the clock speed is significantly 
 
 ## Usage
 
-_Be sure to review the example sketch included with the library._
+_Be sure to review the example sketch included with the library. Also see [below](#additional-code-examples) for links to other libraries and sketches using SWI2C._
 
 First, **include** the library header file:
 
@@ -83,11 +83,11 @@ The following library methods are used to read and write data to the device. All
 - Same as `read2bFromRegister()`, except the first byte received is the most significant byte:
 
     ```cpp
-    int myDevice.read2bFromRegisterMSBFirst(int regAddress, uint16_t* data);
+    int myDevice.read2bFromRegisterMSBFirst(int regAddress, uint16_t* data_buffer);
     ```
 
-- Read `count` number of bytes from from register address `regAddress` into `data`. **`data` must defined to have at least `count` elements.**
-Bytes received are placed in `data` LSB first (i.e., the first byte received is put in data[0], second byte is data[1], etc.):
+- Read `count` number of bytes from from register address `regAddress` into `data_buffer`. **`data_buffer` must defined to have at least `count` elements.**
+Bytes received are placed in `data_buffer` LSB first (i.e., the first byte received is put in `data_buffer[0]`, second byte is `data_buffer[1]`, etc.):
 
     ```cpp
     int myDevice.readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count);
@@ -184,7 +184,7 @@ The library does not use any platform-specific code. All I/O functions use stand
 
 There are no hardcoded delays in the code. In order to support clock-stretching, there is a busy-wait loop in the `sclHi()` method which waits until the SCL line actually goes high before exiting the function. There is a default timeout of 500 ms before the wait times out and the function returns. This delay can be changed on a per-device basis (`setStretchTimeout()`). It can also be set to zero if no timeout is desired (which could potentially cause the library to "lock up" if the I2C device does not properly release the SCL line).
 
-### Future Updates
+## Future Updates
 
 Future potential library updates:
 
@@ -192,14 +192,32 @@ Future potential library updates:
 
 ## References
 
-- NXP [I2C Bus Specification and User Manual](https://www.nxp.com/docs/en/user-guide/UM10204.pdf)
-- Texas Instruments [I2C Application Report](http://www.ti.com/lit/an/slva704/slva704.pdf)
-- [Clock Stretching](https://www.i2c-bus.org/clock-stretching/)
+- NXP [I2C Bus Specification and User Manual][1]
+- Texas Instruments [I2C Application Report][2]
+- [Clock Stretching][3]
+
+## Additional Code Examples
+
+Besides the sketch included in the `examples` folder, several more examples of code using SWI2C are available in my other published libraries and sketches:
+
+- Weather Sensors Software I2C [Library][10]
+- EEPROM Software I2C [Library][11]
+- BQ27441 Software I2C [Library][12]
+- Tempearature Sensor With Display [Sketch][13]
+- Sensor Repeater [Sketch][14]
 
 ## License
 
 The software and other files in this repository are released under what is commonly called the [MIT License][100]. See the file [`LICENSE`][101] in this repository.
 
+[1]: https://www.nxp.com/docs/en/user-guide/UM10204.pdf
+[2]: http://www.ti.com/lit/an/slva704/slva704.pdf
+[3]: https://www.i2c-bus.org/clock-stretching/
+[10]: https://github.com/Andy4495/Weather_Sensors_SWI2C
+[11]: https://github.com/Andy4495/EEPROM_24C08_SWI2C
+[12]: https://github.com/Andy4495/BQ27441_SWI2C
+[13]: https://github.com/Andy4495/MSP430TempSensorWithDisplay
+[14]: https://github.com/Andy4495/Sensor-Repeater
 [100]: https://choosealicense.com/licenses/mit/
 [101]: ./LICENSE
 [200]: https://github.com/Andy4495/SWI2C
