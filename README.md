@@ -7,7 +7,7 @@ The MSP430G2 and MSP430FR4133 LaunchPads do not support using both hardware SPI 
 - Hardcoded delays
   - Hardcoded delays should not be necessary at the "slow" signaling speeds inherent in a software-based I2C solution using `digitalWrite()` and `pinMode()` methods.
 - Lack of or incorrect support of clock stretching
-- Incorrectly using `pinMode(HIGH)` for indicating a "HIGH" value on SCL or SDA
+- Incorrectly using `pinMode(OUTPUT)` and `digitalWrite(HIGH)` for indicating a "HIGH" value on SCL or SDA
   - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in `INPUT` mode. `INPUT` mode does not drive the bus high or low,  and allows the external pull-ups to assert the high level.
 
 This library implements the I2C protocol without any of the above issues.
@@ -42,7 +42,7 @@ myDevice.begin();
 
 ### High Level Library Methods
 
-The following library methods are used to read and write data to the device. All currently return the value `1`.
+The following library methods are used to read and write data to the device. All return the value `1` if the message was sent successfully, and return `0` if a NACK was detected during the I2C communication.
 
 - Write an 8-bit `data` value to device register `regAddress`:
 
@@ -188,7 +188,8 @@ There are no hardcoded delays in the code. In order to support clock-stretching,
 
 Future potential library updates:
 
-- Additional error checking
+- Support for "repeated start"
+- Direct support for devices without register address
 
 ## References
 
