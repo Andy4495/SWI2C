@@ -20,25 +20,27 @@ Since this is a software-based implementation, the clock speed is significantly 
 
 _Be sure to review the example sketch included with the library. Also see [below](#additional-code-examples) for links to other libraries and sketches using SWI2C._
 
-First, **include** the library header file:
+1. **Include** the library header file:
 
-```cpp
-#include "SWI2C.h"
-```
+    ```cpp
+    #include "SWI2C.h"
+    ```
 
-Next, **instantiate** an object for each I2C device using SWI2C. The device address and I2C pins are defined in the object constructor, so you need a separate object for each device. Note that this is different from the way that the Wire library operates.
+2. **Instantiate** an object for each I2C device using SWI2C. The device address and I2C pins are defined in the object constructor, so you need a separate object for each device. Note that this is different from the way that the Wire library operates.
 
-`sda_pin` is the pin number for the SDA signal, `scl_pin` is the pin number for the SCL signal, and `deviceID` is the 7-bit device address of the I2C device represented by this object instance. `deviceID` does *not* include the read/write bit.
+    `sda_pin` is the pin number for the SDA signal, `scl_pin` is the pin number for the SCL signal, and `deviceID` is the 7-bit device address of the I2C device represented by this object instance. `deviceID` does *not* include the read/write bit.
 
-```cpp
-SWI2C myDevice(uint8_t sda_pin, uint8_t scl_pin, uint8_t deviceID);
-```
+    ```cpp
+    SWI2C myDevice(uint8_t sda_pin, uint8_t scl_pin, uint8_t deviceID);
+    ```
 
-Then, **initialize** the hardware before using the I2C device:
+3. **Initialize** the hardware before using the I2C device:
 
-```cpp
-myDevice.begin();
-```
+    ```cpp
+    myDevice.begin();
+    ```
+
+4. Use the high or low level library methods described below.
 
 ### High Level Library Methods
 
@@ -62,16 +64,16 @@ The following library methods are used to read and write data to the device. All
     int myDevice.write2bToRegisterMSBFirst(int regAddress, uint16_t data);
     ```
 
-- Write `count` bytes from `data` to register address `regAddress`:
+- Write `count` bytes from the location pointed to by `data_buffer` to register address `regAddress`:
 
     ```cpp
-    int myDevice.writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count)
+    int myDevice.writeBytesToRegister(int regAddress, uint8_t* data_buffer, uint8_t count)
     ```
 
-- Read 8-bit value from register address `regAddress` into the location pointed to by `data`:
+- Read 8-bit value from register address `regAddress` into the location pointed to by `data_buffer`:
 
     ```cpp
-    int myDevice.read1bFromRegister(int regAddress, uint8_t* data);
+    int myDevice.read1bFromRegister(int regAddress, uint8_t* data_buffer);
     ```
 
 - Read 16-bit value from register address `regAddress` into the location pointed to by `data`. This function assumes that the first byte received is the least significant byte:
@@ -86,14 +88,14 @@ The following library methods are used to read and write data to the device. All
     int myDevice.read2bFromRegisterMSBFirst(int regAddress, uint16_t* data);
     ```
 
-- Read `count` number of bytes from from register address `regAddress` into `data_buffer`. **`data_buffer` must defined to have at least `count` elements.**
+- Read `count` number of bytes from from register address `regAddress` into the location pointed to by `data_buffer`. **`data_buffer` must be defined to have at least `count` elements.**
 Bytes received are placed in `data_buffer` LSB first (i.e., the first byte received is put in `data_buffer[0]`, second byte is `data_buffer[1]`, etc.):
 
     ```cpp
     int myDevice.readBytesFromRegister(int regAddress, uint8_t* data_buffer, uint8_t count);
     ```
 
-### Lower Level Methods
+### Low Level Methods
 
 Although general I2C communication can be done with the above `readFrom` and `writeTo` methods, there may be times where more direct control of the protocol is required. The following public methods are also available in the SWI2C class.
 
