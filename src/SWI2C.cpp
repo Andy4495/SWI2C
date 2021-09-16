@@ -8,6 +8,7 @@
    10/17/2018 - A.T. - Add 2-byte write method and methods to swap MSB/LSB
                        for 2-byte reads and writes.
    08/25/2021 - A.T. - Add error checking for NACKs received from device (Issue #4)
+   09/16/2021 - A.T. - Add support for Repeated Start (Issue #5)
 */
 
 #include "SWI2C.h"
@@ -271,11 +272,11 @@ void SWI2C::writeByte(int data) {
 }
 
 // New method for name consistency, keep the old method for backward compatibility
-int SWI2C::write1bToRegister(int regAddress, uint8_t data) {
-  return writeToRegister(regAddress, data);
+int SWI2C::write1bToRegister(int regAddress, uint8_t data, bool sendStopBit) {
+  return writeToRegister(regAddress, data, sendStopBit);
 }
 
-int SWI2C::write2bToRegister(int regAddress, uint16_t data) {
+int SWI2C::write2bToRegister(int regAddress, uint16_t data, bool sendStopBit) {
   // LEAST significant BYTE is transferred first
   // If device is expecting MSB first, use write2bToRegisterMSBFirst()
   int ackBitError = 0; 
@@ -289,16 +290,16 @@ int SWI2C::write2bToRegister(int regAddress, uint16_t data) {
   ackBitError += checkAckBit();
   writeByte(data >> 8);   // MSB
   ackBitError += checkAckBit();
-  stopBit();
+  if (sendStopBit) stopBit();
   return ackBitError ? 0 : 1;    // Return 1 if no NACKs, 0 if NACKS received      
 }
 
-int SWI2C::write2bToRegisterMSBFirst(int regAddress, uint16_t data) {
+int SWI2C::write2bToRegisterMSBFirst(int regAddress, uint16_t data, bool sendStopBit) {
   // Swaps MSB and LSB
-  return write2bToRegister(regAddress, ((data & 0xFF00) >> 8) | ((data & 0xFF) << 8));
+  return write2bToRegister(regAddress, ((data & 0xFF00) >> 8) | ((data & 0xFF) << 8), sendStopBit);
 }
 
-int SWI2C::writeToRegister(int regAddress, uint8_t data) {
+int SWI2C::writeToRegister(int regAddress, uint8_t data, bool sendStopBit) {
   int ackBitError = 0; 
 
   startBit();
@@ -308,11 +309,11 @@ int SWI2C::writeToRegister(int regAddress, uint8_t data) {
   ackBitError += checkAckBit();
   writeByte(data);
   ackBitError += checkAckBit();
-  stopBit();
+  if (sendStopBit) stopBit();
   return ackBitError ? 0 : 1;    // Return 1 if no NACKs, 0 if NACKS received      
 }
 
-int SWI2C::read1bFromRegister(int regAddress, uint8_t* data) {
+int SWI2C::read1bFromRegister(int regAddress, uint8_t* data, bool sendStopBit) {
   int ackBitError = 0; 
 
   startBit();
@@ -320,17 +321,16 @@ int SWI2C::read1bFromRegister(int regAddress, uint8_t* data) {
   ackBitError += checkAckBit();
   writeRegister(regAddress);
   ackBitError += checkAckBit();
-//  stopBit();
   startBit();
   writeAddress(1); // 1 == Read bit
   ackBitError += checkAckBit();
   *data = read1Byte();
   checkAckBit(); // Controller needs to send NACK when done reading data
-  stopBit();
+  if (sendStopBit) stopBit();
   return ackBitError ? 0 : 1;    // Return 1 if no NACKs, 0 if NACKS received      
 }
 
-int SWI2C::read2bFromRegister(int regAddress, uint16_t* data) {
+int SWI2C::read2bFromRegister(int regAddress, uint16_t* data, bool sendStopBit) {
   // Returns first byte received in LSB. If MSB is first, then use read2bFromRegisterMSBFirst()
   int ackBitError = 0; 
 
@@ -339,27 +339,26 @@ int SWI2C::read2bFromRegister(int regAddress, uint16_t* data) {
   ackBitError += checkAckBit();
   writeRegister(regAddress);
   ackBitError += checkAckBit();
-//  stopBit();
   startBit();
   writeAddress(1); // 1 == Read bit
   ackBitError += checkAckBit();
   *data = read2Byte(); // Assumes LSB received first
   checkAckBit(); // Controller needs to send NACK when done reading data
-  stopBit();
+  if (sendStopBit) stopBit();
   return ackBitError ? 0 : 1;    // Return 1 if no NACKs, 0 if NACKS received      
 }
 
-int SWI2C::read2bFromRegisterMSBFirst(int regAddress, uint16_t* data) {
+int SWI2C::read2bFromRegisterMSBFirst(int regAddress, uint16_t* data, bool sendStopBit) {
   int ackBitError = 0; 
   int retval;
 
-  retval = read2bFromRegister(regAddress, data);
+  retval = read2bFromRegister(regAddress, data, sendStopBit);
   *data = ((*data & 0xFF00) >> 8) | ((*data & 0xFF) << 8);
   return retval; 
   return ackBitError ? 0 : 1;    // Return 1 if no NACKs, 0 if NACKS received      
 }
 
-int SWI2C::readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count) {
+int SWI2C::readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count, bool sendStopBit) {
   // Reads <count> bytes after sending device address and register address.
   // Bytes are returned in <data>, which is assumed to be at least <count> bytes in size.
   int ackBitError = 0; 
@@ -369,7 +368,6 @@ int SWI2C::readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count) {
   ackBitError += checkAckBit();
   writeRegister(regAddress);
   ackBitError += checkAckBit();
-  //  stopBit();
   startBit();
   writeAddress(1); // 1 == Read bit
   ackBitError += checkAckBit();
@@ -383,12 +381,12 @@ int SWI2C::readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count) {
       checkAckBit(); // Controller needs to send NACK when done reading data
     }
   }
-  stopBit();
+  if (sendStopBit == false) stopBit();
 
   return ackBitError ? 0 : 1;    // Return 1 if no NACKs, 0 if NACKS received      
 }
 
-int SWI2C::writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count) {
+int SWI2C::writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count, bool sendStopBit) {
   // Writes <count> bytes after sending device address and register address.
   // Least significant byte is written first, ie. data[0] sent first
   int ackBitError = 0; 
@@ -403,6 +401,6 @@ int SWI2C::writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count) {
     writeByte(data[i] & 0xFF); // LSB
     ackBitError += checkAckBit();
   }
-  stopBit();
+  if (sendStopBit) stopBit();
   return ackBitError ? 0 : 1;    // Return 1 if no NACKs, 0 if NACKS received      
 }

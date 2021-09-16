@@ -6,7 +6,7 @@
    03/25/2018 - A.T. - Original
    07/04/2018 - A.T. - Add timeout for clock stretching
    10/17/2018 - A.T. - Add 2-byte write method
-
+   09/16/2021 - A.T. - Add support for Repeated Start (Issue #5)
 */
 
 #ifndef SWI2C_H
@@ -18,15 +18,15 @@ class SWI2C {
 public:
   SWI2C(uint8_t sda_pin, uint8_t scl_pin, uint8_t deviceID);
   void begin();
-  int write1bToRegister(int regAddress, uint8_t data);
-  int write2bToRegister(int regAddress, uint16_t data);
-  int write2bToRegisterMSBFirst(int regAddress, uint16_t data) ;
-  int writeToRegister(int regAddress, uint8_t data);
-  int writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count);
-  int read1bFromRegister(int regAddress, uint8_t* data);
-  int read2bFromRegister(int regAddress, uint16_t* data);
-  int read2bFromRegisterMSBFirst(int regAddress, uint16_t* data);
-  int readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count);
+  int write1bToRegister(int regAddress, uint8_t data, bool sendStopBit = true);
+  int write2bToRegister(int regAddress, uint16_t data, bool sendStopBit = true);
+  int write2bToRegisterMSBFirst(int regAddress, uint16_t data, bool sendStopBit = true) ;
+  int writeToRegister(int regAddress, uint8_t data, bool sendStopBit = true);
+  int writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count, bool sendStopBit = true);
+  int read1bFromRegister(int regAddress, uint8_t* data, bool sendStopBit = true);
+  int read2bFromRegister(int regAddress, uint16_t* data, bool sendStopBit = true);
+  int read2bFromRegisterMSBFirst(int regAddress, uint16_t* data, bool sendStopBit = true);
+  int readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count, bool sendStopBit = true);
   void sclHi();
   void sclLo();
   void sdaHi();
