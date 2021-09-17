@@ -46,7 +46,7 @@ _Be sure to review the example sketch included with the library. Also see [below
 
 The following library methods are used to read and write data to the device. All return the value `1` if the message was sent successfully, and return `0` if a NACK was detected during the I2C communication.
 
-Each of the high level methods listed below also takes an optional final parameter `bool sendStopbit` which defaults to `true` (and therefore does not need to be specified when calling any of these methods). When `sendStopBit` is `true`, the I2C message will end with a Stop Bit and release control of the I2C bus. If set to `false`, a Stop Bit will not be sent at the end of the message, and the I2C bus will be kept active by the controller. This is also referred to as the "repeated start" condition, and is probably of limited usefulness when using this library.
+Each of the high level methods listed below also takes an optional final parameter `bool sendStopBit` which defaults to `true` (and therefore does not need to be specified when calling any of these methods). When `sendStopBit` is `true`, the I2C message will end with a STOP bit and release control of the I2C bus. If set to `false`, a STOP bit will not be sent at the end of the message, and the I2C bus will be kept active by the controller. This is also referred to as a "repeated start" or "restart" condition, and is probably of limited usefulness when using this library.
 
 - Write an 8-bit `data` value to device register `regAddress`:
 
@@ -192,7 +192,6 @@ There are no hardcoded delays in the code. In order to support clock-stretching,
 
 Future potential library updates:
 
-- Support for "repeated start"
 - Direct support for devices without register address
 
 ## References

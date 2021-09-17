@@ -381,7 +381,7 @@ int SWI2C::readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count, b
       checkAckBit(); // Controller needs to send NACK when done reading data
     }
   }
-  if (sendStopBit == false) stopBit();
+  if (sendStopBit) stopBit();
 
   return ackBitError ? 0 : 1;    // Return 1 if no NACKs, 0 if NACKS received      
 }
