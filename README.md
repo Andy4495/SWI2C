@@ -1,5 +1,8 @@
 # SWI2C Library
 
+[![Arduino Compile Sketches](https://github.com/Andy4495/SWI2C/actions/workflows/arduino-compile-sketches.yml/badge.svg)](https://github.com/Andy4495/SWI2C/actions/workflows/arduino-compile-sketches.yml)
+[![Check Markdown Links](https://github.com/Andy4495/SWI2C/actions/workflows/CheckMarkdownLinks.yml/badge.svg)](https://github.com/Andy4495/SWI2C/actions/workflows/CheckMarkdownLinks.yml)
+
 This library implements a software (bit-bang) I2C controller interface. It was written without any platform-specific code, and should therefore work on any platform supported by the Arduino or Energia IDEs.
 
 The MSP430G2 and MSP430FR4133 LaunchPads do not support using both hardware SPI and hardware I2C at the same time. This became a roadblock in one of my projects as I needed to use both types of interfaces for the devices I was using. I tried several different software I2C libraries, but each one that I tried had a shortcoming that was not acceptable for my application:
@@ -28,7 +31,7 @@ _Be sure to review the example sketch included with the library. Also see [below
 
 2. **Instantiate** an object for each I2C device using SWI2C. The device address and I2C pins are defined in the object constructor, so you need a separate object for each device. Note that this is different from the way that the Wire library operates.
 
-    `sda_pin` is the pin number for the SDA signal, `scl_pin` is the pin number for the SCL signal, and `deviceID` is the 7-bit device address of the I2C device represented by this object instance. `deviceID` does *not* include the read/write bit.
+    `sda_pin` is the pin number for the SDA signal, `scl_pin` is the pin number for the SCL signal, and `deviceID` is the 7-bit device address of the I2C device represented by this object instance. `deviceID` does _not_ include the read/write bit.
 
     ```cpp
     SWI2C myDevice(uint8_t sda_pin, uint8_t scl_pin, uint8_t deviceID);
