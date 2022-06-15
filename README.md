@@ -13,15 +13,31 @@ The MSP430G2 and MSP430FR4133 LaunchPads do not support using both hardware SPI 
 - Incorrectly using `pinMode(OUTPUT)` and `digitalWrite(HIGH)` for indicating a "HIGH" value on SCL or SDA
   - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in `INPUT` mode. `INPUT` mode does not drive the bus high or low,  and allows the external pull-ups to assert the high level.
 
-This library implements the I2C protocol without any of the above issues.
-
-This library is not a drop-in replacement for Wire. You will therefore need to write your own code for modules that need to use this library. However, the interface is kept simple while still providing low-level signaling functionality to allow tailoring to your specific application.
+This library implements the I2C protocol without the above issues.
 
 Since this is a software-based implementation, the clock speed is significantly reduced compared to a hardware-based I2C implementation. Expect a clock speed of about 25 KHz when using an 8 MHz microcontroller.
 
+## Comparison to Arduino Wire Library
+
+This library is not a drop-in replacement for [Wire][15]. You will therefore need to write your own code for sketches that need to use this library.
+
+However, this library provides a much simpler interface than the Wire library, and modifying existing code to use this new library should be relatively straightforward in most cases.
+
+I consider the Arduino Wire library needlessly complicated, particularly for beginners, for two key reasons:
+
+1. The vast majority of I2C devices that I have worked with generally have a simple "read from register" or "write to register" interface.
+    - This implies that a simple API that provides single command `readFromRegister()` and `writeToRegister()` methods should be a key part of the library.
+    - The user should not have to string together multiple commands just to perform a simple write to a device register.
+    - The API should provide the hooks necessary to support more complicated communications, but not at the expense of ease-of-use for the most common use cases.
+2. The Wire library abstracts the I2C hardware interface as the object being acted on.
+    - From a design standpoint, I would suggest that the actual I2C *device* is the object that is being acted on.  
+    - The interface should therefore be modeled with the *device* as the object created in code, not the hardware interface.  
+
+This software I2C library therefore was designed so that the I2C *device* is the object being acted on by the various methods. The API provides several simple `readFrom()` and `writeTo()` methods, while also including low-level signaling functionality to create more complicated communication flows when necessary.
+
 ## Usage
 
-_Be sure to review the example sketch included with the library. Also see [below](#additional-code-examples) for links to other libraries and sketches using SWI2C._
+*Be sure to review the example sketch included with the library. Also see [below](#additional-code-examples) for links to other libraries and sketches using SWI2C.*
 
 1. **Include** the library header file:
 
@@ -31,7 +47,7 @@ _Be sure to review the example sketch included with the library. Also see [below
 
 2. **Instantiate** an object for each I2C device using SWI2C. The device address and I2C pins are defined in the object constructor, so you need a separate object for each device. Note that this is different from the way that the Wire library operates.
 
-    `sda_pin` is the pin number for the SDA signal, `scl_pin` is the pin number for the SCL signal, and `deviceID` is the 7-bit device address of the I2C device represented by this object instance. `deviceID` does _not_ include the read/write bit.
+    `sda_pin` is the pin number for the SDA signal, `scl_pin` is the pin number for the SCL signal, and `deviceID` is the 7-bit device address of the I2C device represented by this object instance. `deviceID` does *not* include the read/write bit.
 
     ```cpp
     SWI2C myDevice(uint8_t sda_pin, uint8_t scl_pin, uint8_t deviceID);
@@ -189,7 +205,9 @@ Although general I2C communication can be done with the above `readFrom` and `wr
 
 The library does not use any platform-specific code. All I/O functions use standard Arduino `pinMode()`, `digitalRead()`, and `digitalWrite()` functions. Reading and writing to the I2C device is accomplished by stringing together the basic signaling primitives specified by the protocol.
 
-There are no hardcoded delays in the code. In order to support clock-stretching, there is a busy-wait loop in the `sclHi()` method which waits until the SCL line actually goes high before exiting the function. There is a default timeout of 500 ms before the wait times out and the function returns. This delay can be changed on a per-device basis (`setStretchTimeout()`). It can also be set to zero if no timeout is desired (which could potentially cause the library to "lock up" if the I2C device does not properly release the SCL line).
+There are no hardcoded delays in the code. However, the high-level `readFrom()` and `writeTo()` methods are blocking -- they do not return until the message is completed or the clock-stretching timeout has been exceeded.
+
+The clock-stretching timeout is implemented with a busy-wait loop in the `sclHi()` method which waits until the SCL line actually goes high before exiting the function. There is a default timeout of 500 ms before the wait times out and the function returns. This delay can be changed on a per-device basis (`setStretchTimeout()`). It can also be set to zero if no timeout is desired (which could potentially cause the library to "lock up" if the I2C device does not properly release the SCL line).
 
 ## Future Updates
 
@@ -202,6 +220,7 @@ Future potential library updates:
 - NXP [I2C Bus Specification and User Manual][1]
 - Texas Instruments [I2C Application Report][2]
 - [Clock Stretching][3]
+- Arduino Hardware I2C [Wire library][15]
 
 ## Additional Code Examples
 
@@ -225,6 +244,7 @@ The software and other files in this repository are released under what is commo
 [12]: https://github.com/Andy4495/BQ27441_SWI2C
 [13]: https://github.com/Andy4495/MSP430TempSensorWithDisplay
 [14]: https://github.com/Andy4495/Sensor-Repeater
+[15]: https://www.arduino.cc/reference/en/language/functions/communication/wire/
 [100]: https://choosealicense.com/licenses/mit/
 [101]: ./LICENSE
 [200]: https://github.com/Andy4495/SWI2C
