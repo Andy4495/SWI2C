@@ -31,9 +31,9 @@ I consider the Arduino Wire library needlessly complicated, particularly for beg
     - The API should provide the hooks necessary to support more complicated communications, but not at the expense of ease-of-use for the most common use cases.
 2. The Wire library abstracts the I2C hardware interface as the object being acted on.
     - From a design standpoint, I would suggest that the actual I2C *device* is the object that is being acted on.  
-    - The interface should therefore be modeled with the *device* as the object created in code, not the hardware interface.  
+    - The interface should therefore be modeled with the *device* as the object instantiated in code, not the hardware interface.  
 
-This software I2C library therefore was designed so that the I2C *device* is the object being acted on by the various methods. The API provides several simple `readFrom()` and `writeTo()` methods, while also including low-level signaling functionality to create more complicated communication flows when necessary.
+This software I2C library was designed so that the I2C *device* is the object that is instantiated and being acted on by the various methods. The API provides several simple `readFrom()` and `writeTo()` methods, while also including low-level signaling functionality to create more complicated communication flows when necessary.
 
 ## Usage
 
@@ -59,11 +59,20 @@ This software I2C library therefore was designed so that the I2C *device* is the
     myDevice.begin();
     ```
 
-4. Use the high or low level library methods described below.
+4. Use the high level or low level library methods described below.
 
 ### High Level Library Methods
 
-The following library methods are used to read and write data to the device. All return the value `1` if the message was sent successfully, and return `0` if a NACK was detected during the I2C communication.
+The following high level library methods are used to read and write data to the device.
+
+All of the high level methods return the value `1` if the message was sent successfully, and return `0` if a NACK was detected during the I2C communication.
+
+If a NACK was detected:  
+
+- The transmission is immediately stopped, with no more data sent or received.
+- An I2C STOP condition is signalled on the bus.
+- The I2C bus is released.
+- The contents of the `data` variable for the various `readRegister()` methods should be assumed to be invalid, as a partial or incorrect data transfer has occurred.
 
 Each of the high level methods listed below also takes an optional final parameter `bool sendStopBit` which defaults to `true` (and therefore does not need to be specified when calling any of these methods). When `sendStopBit` is `true`, the I2C message will end with a STOP bit and release control of the I2C bus. If set to `false`, a STOP bit will not be sent at the end of the message, and the I2C bus will be kept active by the controller. This is also referred to as a "repeated start" or "restart" condition, and is probably of limited usefulness when using this library.
 
@@ -229,7 +238,7 @@ Besides the sketch included in the `examples` folder, several more examples of c
 - Weather Sensors Software I2C [Library][10]
 - EEPROM Software I2C [Library][11]
 - BQ27441 Software I2C [Library][12]
-- Tempearature Sensor With Display [Sketch][13]
+- Temperature Sensor With Display [Sketch][13]
 - Sensor Repeater [Sketch][14]
 
 ## License
