@@ -19,6 +19,12 @@ jobs:
           enable-warnings-report: true
           libraries: |
             - source-path: ./
+      # Now trigger builds on repos dependent on SWI2C
       - run: |
           curl -X POST https://api.github.com/repos/Andy4495/Weather_Sensors_SWI2C/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main"}'
+          curl -X POST https://api.github.com/repos/Andy4495/MSP430TempSensorWithDisplay/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main"}'
+          curl -X POST https://api.github.com/repos/Andy4495/Sensor-Repeater/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main"}'
+          curl -X POST https://api.github.com/repos/Andy4495/BQ27441_SWI2C/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main"}'
+          curl -X POST https://api.github.com/repos/Andy4495/EEPROM_24C08_SWI2C/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main"}'
+          curl -X POST https://api.github.com/repos/Andy4495/Outdoor-Weather-Sensor/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main"}'
 
