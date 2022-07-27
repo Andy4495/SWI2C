@@ -7,6 +7,7 @@
    07/04/2018 - A.T. - Add timeout for clock stretching
    10/17/2018 - A.T. - Add 2-byte write method
    09/16/2021 - A.T. - Add support for Repeated Start (Issue #5)
+   07/27/2022 - Andy4495 - Support single-register devices (Issue #3)
 */
 
 #ifndef SWI2C_H
@@ -23,10 +24,12 @@ public:
   int write2bToRegisterMSBFirst(int regAddress, uint16_t data, bool sendStopBit = true) ;
   int writeToRegister(int regAddress, uint8_t data, bool sendStopBit = true);
   int writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count, bool sendStopBit = true);
+  int writeBytesToDevice(uint8_t* data, uint8_t count, bool sendStopBit = true);
   int read1bFromRegister(int regAddress, uint8_t* data, bool sendStopBit = true);
   int read2bFromRegister(int regAddress, uint16_t* data, bool sendStopBit = true);
   int read2bFromRegisterMSBFirst(int regAddress, uint16_t* data, bool sendStopBit = true);
   int readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count, bool sendStopBit = true);
+  int readBytesFromDevice(uint8_t* data, uint8_t count, bool sendStopBit = true);
   void sclHi();
   void sclLo();
   void sdaHi();

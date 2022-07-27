@@ -10,6 +10,7 @@
    08/25/2021 - A.T. - Add error checking for NACKs received from device (Issue #4)
    09/16/2021 - A.T. - Add support for Repeated Start (Issue #5)
    06/15/2022 - A.T. - Properly handle NACK from device (Issue #6)
+   07/27/2022 - Andy4495 - Support single-register devices (Issue #3)
 */
 
 #include "SWI2C.h"
@@ -378,6 +379,29 @@ int SWI2C::readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count, b
   return 1;  // Return 1 if no NACKs
 }
 
+int SWI2C::readBytesFromDevice(uint8_t* data, uint8_t count, bool sendStopBit) {
+  // Use this with devices that do not use register addresses.
+  // Reads <count> bytes after sending device address.
+  // Bytes are returned in <data>, which is assumed to be at least <count> bytes in size.
+
+  startBit();
+  writeAddress(1); // 1 == Read bit
+  if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
+  // Loop data bytes
+  for (int i = 0; i < count; i++) {
+    data[i] = read1Byte();
+    if (i < (count-1)) {
+      writeAck();
+    }
+    else { // Last byte needs a NACK
+      checkAckBit(); // Controller needs to send NACK when done reading data
+    }
+  }
+  if (sendStopBit) stopBit();
+  return 1;  // Return 1 if no NACKs
+}
+
+
 int SWI2C::writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count, bool sendStopBit) {
   // Writes <count> bytes after sending device address and register address.
   // Least significant byte is written first, ie. data[0] sent first
@@ -386,6 +410,23 @@ int SWI2C::writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count, bo
   writeAddress(0);
   if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
   writeRegister(regAddress);
+  if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
+  // Loop data bytes
+  for (int i = 0; i < count; i++) {
+    writeByte(data[i] & 0xFF); // LSB
+    if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
+  }
+  if (sendStopBit) stopBit();
+  return 1;  // Return 1 if no NACKs
+}
+
+int SWI2C::writeBytesToDevice(uint8_t* data, uint8_t count, bool sendStopBit) {
+  // Use with devices that do not use register addresses. 
+  // Writes <count> bytes after sending device address.
+  // Least significant byte is written first, ie. data[0] sent first
+
+  startBit();
+  writeAddress(0);
   if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
   // Loop data bytes
   for (int i = 0; i < count; i++) {
