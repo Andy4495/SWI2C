@@ -5,7 +5,7 @@
 
 This library implements a software I2C controller interface. It was written without any platform-specific code, and should therefore work on any platform supported by the Arduino or Energia IDEs.
 
-Since this is a software-based, platform-agnostic implementation, the clock speed is significantly reduced compared to a hardware-based I2C implementation. Expect a clock speed of about 25 KHz when using an 8 MHz microcontroller.
+Since this is a software-based, platform-agnostic implementation, the clock speed is significantly reduced compared to a hardware-based I2C implementation. Expect an I2C clock speed of about 25 KHz when using an 8 MHz microcontroller.
 
 ## Comparison to Arduino Wire Library
 
@@ -133,7 +133,7 @@ Bytes received are placed in `data_buffer` LSB first (i.e., the first byte recei
 
 All of the high level methods above return the integer `1` if the message was sent successfully, and return `0` if a NACK was detected during the I2C communication.
 
-If a NACK was detected:  
+If a NACK was detected (return code `0`):  
 
 - The transmission is immediately stopped, with no more data sent or received.
 - An I2C STOP condition is signalled on the bus.
@@ -142,13 +142,15 @@ If a NACK was detected:
 
 #### Repeated Start
 
-Each of the high level methods listed above also takes an optional final parameter `bool sendStopBit` which defaults to `true` (and therefore does not need to be specified when calling any of these methods). When `sendStopBit` is `true`, the I2C message will end with a STOP bit and release control of the I2C bus. If set to `false`, a STOP bit will not be sent at the end of the message, and the I2C bus will be kept active by the controller. This is also referred to as a "repeated start" or "restart" condition, and is probably of limited usefulness when using this library.
+Each of the high level methods listed above also takes an optional final parameter `bool sendStopBit` which defaults to `true` (and therefore does not need to be specified when calling any of these methods). When `sendStopBit` is `true`, the I2C message will end with a STOP bit and release control of the I2C bus.
+
+To trigger a [repeated start][17] condition (sometimes referred to as a restart condition), set `sendStopBit` to `false`. In this case a STOP bit will not be sent at the end of the message, and the I2C bus will be kept active by the controller.
 
 ### Low Level Methods
 
 Although general I2C communication can be done with the above `readFrom` and `writeTo` methods, there may be times where more direct control of the protocol is required. The following public methods are also available in the SWI2C class.
 
-- The following methods are self-explanatory -- they set the SCL or SDA lines HIGH or LOW:
+- The following methods set the SCL or SDA lines HIGH or LOW:
 
     ```cpp
     void sclHi();
@@ -270,6 +272,7 @@ The software and other files in this repository are released under what is commo
 [14]: https://github.com/Andy4495/Sensor-Repeater
 [15]: https://www.arduino.cc/reference/en/language/functions/communication/wire/
 [16]: https://www.ti.com/lit/ds/symlink/pca9548a.pdf
+[17]: https://www.i2c-bus.org/repeated-start-condition/
 [100]: https://choosealicense.com/licenses/mit/
 [101]: ./LICENSE
 [200]: https://github.com/Andy4495/SWI2C
