@@ -168,25 +168,25 @@ The following additional high level library methods can also be used to read and
 - Write a 16-bit `data` value to device register `regAddress`. The first byte written is the least signifcant byte of `data`:
 
     ```cpp
-    int myDevice.write2bToRegister(int regAddress, uint16_t data);
+    int myDevice.write2bToRegister(uint8_t regAddress, uint16_t data);
     ```
 
 - Same as `write2bToRegister()`, except that the first byte written is the most signifcant byte of `data`:
 
     ```cpp
-    int myDevice.write2bToRegisterMSBFirst(int regAddress, uint16_t data);
+    int myDevice.write2bToRegisterMSBFirst(uint8_t regAddress, uint16_t data);
     ```
 
 - Read 16-bit value from register address `regAddress` into the location pointed to by `data`. This function assumes that the first byte received is the least significant byte:
 
     ```cpp
-    int myDevice.read2bFromRegister(int regAddress, uint16_t* data);
+    int myDevice.read2bFromRegister(uint8_t regAddress, uint16_t* data);
     ```
 
 - Same as `read2bFromRegister()`, except the first byte received is the most significant byte:
 
     ```cpp
-    int myDevice.read2bFromRegisterMSBFirst(int regAddress, uint16_t* data);
+    int myDevice.read2bFromRegisterMSBFirst(uint8_t regAddress, uint16_t* data);
     ```
 
 #### Return Codes
@@ -228,7 +228,7 @@ Although general I2C communication can be done with the above `readFrom` and `wr
 - Write the 7-bit device address along with either a read (1) or write (0) bit (`r_w`), for a total of 8 bits:
 
     ```cpp
-    void writeAddress(int r_w);
+    void writeAddress(uint8_t r_w);
     ```
 
 - Return the value of the ACK bit received (either 1 or 0) from the device. This function is also used to send a NACK from the controller when reading the last byte from the peripheral device:
@@ -246,7 +246,7 @@ Although general I2C communication can be done with the above `readFrom` and `wr
 - Write the 8-bit `regAddress` value to the SDA bus:
 
     ```cpp
-    void writeRegister(int regAddress);
+    void writeRegister(uint8_t regAddress);
     ```
 
 - Signal a STOP bit on the I2C bus:
@@ -270,7 +270,7 @@ Although general I2C communication can be done with the above `readFrom` and `wr
 - Write an 8-bit `data` value to the I2C bus:
 
     ```cpp
-    void writeByte(int data);
+    void writeByte(uint8_t data);
     ```
 
 - Return the current deviceID (7-bit I2C address):
