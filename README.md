@@ -91,13 +91,13 @@ The following high level library methods are used to read and write data to the 
     int myDevice.writeBytesToRegister(int regAddress, uint8_t* data_buffer, uint8_t count);
     ```
 
-- Write 8-bit `data` value to the device. This is used for devices which do not have registers (e.g. PCA9548, PFC8574):
+- Write 8-bit `data` value to the device. This is used for devices which do not have registers (e.g. PCA9548, PCF8574):
 
     ```cpp
     int myDevice.write1bToDevice(uint8_t data);
     ```
 
-- Write `count` bytes from the location pointed to by `data_buffer` to the device. This is used for devices which do not have registers (e.g. PCA9548, PFC8574):
+- Write `count` bytes from the location pointed to by `data_buffer` to the device. This is used for devices which do not have registers (e.g. PCA9548, PCF8574):
 
     ```cpp
     int myDevice.writeBytesToDevice(uint8_t* data_buffer, uint8_t count);
@@ -128,13 +128,13 @@ Bytes received are placed in `data_buffer` LSB first (i.e., the first byte recei
     int myDevice.readBytesFromRegister(int regAddress, uint8_t* data_buffer, uint8_t count);
     ```
 
-- Read a byte from the device into the location pointed to by `data`. This is used for devices which do not have registers (e.g. PCA9548, PFC8574):
+- Read a byte from the device into the location pointed to by `data`. This is used for devices which do not have registers (e.g. PCA9548, PCF8574):
 
     ```cpp
     int myDevice.read1bFromDevice(uint8_t* data);
     ```
 
-- Read `count` number of bytes from the device into the location pointed to by `data_buffer`. This is used for devices which do not have registers (e.g. PCA9548, PFC8574). **`data_buffer` must be defined to have at least `count` elements.**
+- Read `count` number of bytes from the device into the location pointed to by `data_buffer`. This is used for devices which do not have registers (e.g. PCA9548, PCF8574). **`data_buffer` must be defined to have at least `count` elements.**
 Bytes received are placed in `data_buffer` LSB first (i.e., the first byte received is put in `data_buffer[0]`, second byte is `data_buffer[1]`, etc.):
 
     ```cpp
