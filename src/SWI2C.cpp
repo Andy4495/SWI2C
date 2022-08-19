@@ -90,6 +90,15 @@ int SWI2C::checkStretchTimeout(){
   return retval;
 }
 
+uint8_t SWI2C::getDeviceID() {
+  return _deviceID;
+}
+
+void SWI2C::setDeviceID(uint8_t deviceid) {
+  // deviceid is the 7-bit I2C address
+  _deviceID = deviceid;
+}
+
 void SWI2C::writeAddress(int r_w) {  // Assume SCL, SDA already LOW from startBit()
   if (_deviceID & 0x40) sdaHi();     // bit 6
   else sdaLo();
@@ -379,6 +388,18 @@ int SWI2C::readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count, b
   return 1;  // Return 1 if no NACKs
 }
 
+int SWI2C::read1bFromDevice(uint8_t* data, bool sendStopBit){
+  // Use this with devices that do not use register addresses.
+
+  startBit();
+  writeAddress(1); // 1 == Read bit
+  if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
+  // Loop data bytes
+  *data = read1Byte();
+  if (sendStopBit) stopBit();
+  return 1;  // Return 1 if no NACKs  
+}
+
 int SWI2C::readBytesFromDevice(uint8_t* data, uint8_t count, bool sendStopBit) {
   // Use this with devices that do not use register addresses.
   // Reads <count> bytes after sending device address.
@@ -420,6 +441,18 @@ int SWI2C::writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count, bo
   return 1;  // Return 1 if no NACKs
 }
 
+int SWI2C::write1bToDevice(uint8_t data, bool sendStopBit) {
+  // Use with devices that do not use register addresses. 
+
+  startBit();
+  writeAddress(0);
+  if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
+  writeByte(data);
+  if (sendStopBit) stopBit();
+  return 1;  // Return 1 if no NACKs  
+}
+
+
 int SWI2C::writeBytesToDevice(uint8_t* data, uint8_t count, bool sendStopBit) {
   // Use with devices that do not use register addresses. 
   // Writes <count> bytes after sending device address.
@@ -430,7 +463,7 @@ int SWI2C::writeBytesToDevice(uint8_t* data, uint8_t count, bool sendStopBit) {
   if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
   // Loop data bytes
   for (int i = 0; i < count; i++) {
-    writeByte(data[i] & 0xFF); // LSB
+    writeByte(data[i]); // LSB
     if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
   }
   if (sendStopBit) stopBit();

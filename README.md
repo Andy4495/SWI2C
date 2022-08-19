@@ -19,7 +19,7 @@ I consider the Arduino Wire library needlessly complicated, particularly for beg
     - This implies that simple `readFromRegister()` and `writeToRegister()` methods should be a fundamental part of the library API.
     - The user should not have to string together multiple commands just to perform a simple write to a device register.
     - The API should provide the hooks necessary to support more complicated communications, but not at the expense of ease-of-use for the most common use cases.
-2. The Wire library abstracts the I2C hardware interface as the object being acted on.
+2. The Wire library abstracts the I2C *hardware interface* as the object being acted on.
     - From a design standpoint, I would suggest that the actual I2C *device* is the object that is being acted on.  
     - The interface should therefore be modeled with the *device* as the object instantiated in code, not the hardware interface.  
 
@@ -88,13 +88,19 @@ The following high level library methods are used to read and write data to the 
 - Write `count` bytes from the location pointed to by `data_buffer` to register address `regAddress`:
 
     ```cpp
-    int myDevice.writeBytesToRegister(int regAddress, uint8_t* data_buffer, uint8_t count)
+    int myDevice.writeBytesToRegister(int regAddress, uint8_t* data_buffer, uint8_t count);
     ```
 
-- Write `count` bytes from the location pointed to by `data_buffer` to the device. This is used for devices which do not have registers (e.g. PCA9548):
+- Write 8-bit `data` value to the device. This is used for devices which do not have registers (e.g. PCA9548, PFC8574):
 
     ```cpp
-    int myDevice.writeBytesToDevice(uint8_t* data_buffer, uint8_t count)
+    int myDevice.write1bToDevice(uint8_t data);
+    ```
+
+- Write `count` bytes from the location pointed to by `data_buffer` to the device. This is used for devices which do not have registers (e.g. PCA9548, PFC8574):
+
+    ```cpp
+    int myDevice.writeBytesToDevice(uint8_t* data_buffer, uint8_t count);
     ```
 
 - Read 8-bit value from register address `regAddress` into the location pointed to by `data_buffer`:
@@ -122,7 +128,13 @@ Bytes received are placed in `data_buffer` LSB first (i.e., the first byte recei
     int myDevice.readBytesFromRegister(int regAddress, uint8_t* data_buffer, uint8_t count);
     ```
 
-- Read `count` number of bytes from the device into the location pointed to by `data_buffer`. This is used for devices which do not have registers (e.g. PCA9548). **`data_buffer` must be defined to have at least `count` elements.**
+- Read a byte from the device into the location pointed to by `data`. This is used for devices which do not have registers (e.g. PCA9548, PFC8574):
+
+    ```cpp
+    int myDevice.read1bFromDevice(uint8_t* data);
+    ```
+
+- Read `count` number of bytes from the device into the location pointed to by `data_buffer`. This is used for devices which do not have registers (e.g. PCA9548, PFC8574). **`data_buffer` must be defined to have at least `count` elements.**
 Bytes received are placed in `data_buffer` LSB first (i.e., the first byte received is put in `data_buffer[0]`, second byte is `data_buffer[1]`, etc.):
 
     ```cpp
@@ -138,7 +150,7 @@ If a NACK was detected (return code `0`):
 - The transmission is immediately stopped, with no more data sent or received.
 - An I2C STOP condition is signalled on the bus.
 - The I2C bus is released.
-- The contents of the `data` variable for the various `readRegister()` methods should be assumed to be invalid, as a partial or incorrect data transfer has occurred.
+- The contents of the `data` variable for the various `read()` methods should be assumed to be invalid, as a partial or incorrect data transfer has occurred.
 
 #### Repeated Start
 
@@ -213,6 +225,19 @@ Although general I2C communication can be done with the above `readFrom` and `wr
     void writeByte(int data);
     ```
 
+- Return the current deviceID (7-bit I2C address):
+
+    ```cpp
+    uint8_t getDeviceID();
+    ```
+
+- Change the deviceID (7-bit I2C address).  
+  NOTE: The deviceID is set in the SWI2C constructor and under normal circumstances should not need to change. This method is provided for specialized use cases (e.g., where the sketch may change the I2C address of the device by controlling the address configuration pins of the I2C device, or to create an I2C address scanner).
+
+    ```cpp
+    void setDeviceID(uint8_t deviceid);
+    ```
+
 - Set the clock stretching timeout to `t` milliseconds. The default timeout is 500 ms when the SWI2C object is created. If the timeout value is set to zero, then the library will wait indefinitely for the clock to be released by the device:
 
     ```cpp
@@ -239,14 +264,11 @@ There are no hardcoded delays in the code. However, the high-level `readFrom()` 
 
 The clock-stretching timeout is implemented with a busy-wait loop in the `sclHi()` method which waits until the SCL line actually goes high before exiting the function. There is a default timeout of 500 ms before the wait times out and the function returns. This delay can be changed on a per-device basis (`setStretchTimeout()`). It can also be set to zero if no timeout is desired (which could potentially cause the library to "lock up" if the I2C device does not properly release the SCL line).
 
-## References
+## Examples
 
-- NXP [I2C Bus Specification and User Manual][1]
-- Texas Instruments [I2C Application Report][2]
-- [Clock Stretching][3]
-- Arduino Hardware I2C [Wire library][15]
-- PCA9548A 8 channel I2C switch [datasheet][16]
-  - Example of a device which does not have registers. I2C data is read/written immediately after sending the device address.
+Two example sketches use several of the high level `readFrom()` and `writeTo()` class methods.
+
+One of the example sketches implements an I2C address scanner which uses several low level class methods.
 
 ## Additional Code Examples
 
@@ -257,6 +279,15 @@ Besides the sketches included in the `examples` folder, several more examples of
 - BQ27441 Software I2C [Library][12]
 - Temperature Sensor With Display [Sketch][13]
 - Sensor Repeater [Sketch][14]
+
+## References
+
+- NXP [I2C Bus Specification and User Manual][1]
+- Texas Instruments [I2C Application Report][2]
+- [Clock Stretching][3]
+- Arduino Hardware I2C [Wire library][15]
+- PCA9548A 8 channel I2C switch [datasheet][16]
+  - Example of a device which does not have registers. I2C data is read/written immediately after sending the device address.
 
 ## License
 

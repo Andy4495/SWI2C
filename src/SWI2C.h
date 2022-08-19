@@ -24,11 +24,13 @@ public:
   int write2bToRegisterMSBFirst(int regAddress, uint16_t data, bool sendStopBit = true) ;
   int writeToRegister(int regAddress, uint8_t data, bool sendStopBit = true);
   int writeBytesToRegister(int regAddress, uint8_t* data, uint8_t count, bool sendStopBit = true);
+  int write1bToDevice(uint8_t data, bool sendStopBit = true);
   int writeBytesToDevice(uint8_t* data, uint8_t count, bool sendStopBit = true);
   int read1bFromRegister(int regAddress, uint8_t* data, bool sendStopBit = true);
   int read2bFromRegister(int regAddress, uint16_t* data, bool sendStopBit = true);
   int read2bFromRegisterMSBFirst(int regAddress, uint16_t* data, bool sendStopBit = true);
   int readBytesFromRegister(int regAddress, uint8_t* data, uint8_t count, bool sendStopBit = true);
+  int read1bFromDevice(uint8_t* data, bool sendStopBit = true);
   int readBytesFromDevice(uint8_t* data, uint8_t count, bool sendStopBit = true);
   void sclHi();
   void sclLo();
@@ -46,6 +48,8 @@ public:
   unsigned long getStretchTimeout();
   void setStretchTimeout(unsigned long t);
   int checkStretchTimeout();
+  uint8_t getDeviceID();
+  void setDeviceID(uint8_t deviceid);
 private:
   enum {DEFAULT_STRETCH_TIMEOUT = 500UL};   // ms timeout waiting for device to release SCL line
   uint8_t _deviceID;
