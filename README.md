@@ -5,13 +5,11 @@
 
 This library implements a software I2C controller interface. It was written without any platform-specific code, and should therefore work on any platform supported by the Arduino or Energia IDEs.
 
-Since this is a software-based, platform-agnostic implementation, the clock speed is significantly reduced compared to a hardware-based I2C implementation. Expect an I2C clock speed of about 25 KHz when using an 8 MHz microcontroller.
-
 ## Comparison to Arduino Wire Library
 
 This library is not a drop-in replacement for [Wire][15]. You will therefore need to write your own code for sketches that need to use this library.
 
-However, this library provides a much simpler interface than the Wire library, and modifying existing code to use this new library should be relatively straightforward in most cases.
+However, this library provides a much simpler interface than the Wire library, and modifying existing code to use this new library should be relatively straightforward in many cases.
 
 I consider the Arduino Wire library needlessly complicated, particularly for beginners, for two key reasons:
 
@@ -37,7 +35,55 @@ In addition to simplifying the user interface compared to Wire, this library als
 
 This library implements the I2C protocol without the above issues.
 
-## Usage
+## Basic Usage Example
+
+Many I2C devices have a simple "read a byte from a register" or "write a byte to a register" interface. This library has a very simple programming model for those cases. For example:
+
+```cpp
+/* Example of a simple read and write program */
+
+// First, include the library header file
+#include "SWI2C.h"
+
+// Define constants 
+#define SCL_PIN 2
+#define SDA_PIN 3
+#define DEVICE_ADDRESS 0x30 // 7-bit I2C address of the device we are using
+
+// Create an object instance of the I2C device
+SWI2C myDevice = SWI2C(SDA_PIN, SCL_PIN, DEVICE_ADDRESS);
+
+// Other global variables
+uint8_t regAddress;
+uint8_t byte_to_write;
+uint8_t byte_to_read;
+uint8_t buffer[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+void setup() {
+  // Initialize the device
+  myDevice.begin();
+
+}
+
+void loop() {
+  regAddress = 0x10;
+  byte_to_write = 0x55;
+
+  // Write a byte to a device register: 
+  myDevice.writeToRegister(regAddress, byte_to_write);
+  // Read a byte from a device register: 
+  myDevice.readFromRegister(regAddress, byte_to_read);
+
+  // Write several bytes to a device register:
+  myDevice.writeToRegister(regAddress, buffer, 10);
+  // Read several bytes from a device register:
+  myDevice.readFromRegister(regAddress, buffer, 10);
+}
+```
+
+More complex use cases can take advantage of the other high level and low level methods outlined below.
+
+## Usage Details
 
 *Be sure to review the example sketches included with the library. Also see [below](#additional-code-examples) for links to other libraries and sketches using SWI2C.*
 
@@ -63,15 +109,61 @@ This library implements the I2C protocol without the above issues.
 
 4. Use the high level or low level library methods described below.
 
-### High Level Library Methods
+### Basic High Level Library Methods
 
-The following high level library methods are used to read and write data to the device. See [below](#return-codes) for details on the return codes for these methods.
+The library provides several basic methods that can be used to simply interface with a wide variety of I2C devices.
 
-- Write an 8-bit `data` value to device register `regAddress`:
+- Write 8-bit value `data` to register address `regAddress`:
 
     ```cpp
-    int myDevice.writeToRegister(int regAddress, uint8_t data);
+    int writeToRegister(uint8_t regAddress, uint8_t data);
     ```
+
+- Write `count` bytes from `buffer` to register address `regAddress`:
+
+    ```cpp
+    int writeToRegister(uint8_t regAddress, uint8_t* buffer, uint8_t count);
+    ```
+
+- Write 8-bit value `data` to the device. Used for devices which do not have registers (e.g. PCA9548, PCF8574):
+
+    ```cpp
+    int writeToDevice(uint8_t data);
+    ```
+
+- Write `count` bytes from `buffer` to the device. Used for devices which do not have registers (e.g. PCA9548, PCF8574):
+
+    ```cpp
+    int writeToDevice(uint8_t* buffer, uint8_t count);
+    ```
+
+- Read 8-bit value `data` from register address `regAddress`:
+
+    ```cpp
+    int readFromRegister(uint8_t regAddress, uint8_t &data);
+    ```
+
+- Read `count` bytes into `buffer` from register address `regAddress`. **`buffer` must be defined to have at least `count` elements.** Bytes received are placed in `buffer` LSB first (i.e., the first byte received is put in `buffer[0]`, second byte is `buffer[1]`, etc.):
+
+    ```cpp
+    int readFromRegister(uint8_t regAddress, uint8_t* buffer, uint8_t count);
+    ```
+
+- Read 8-bit value `data` from the device. Used for devices which do not have registers (e.g. PCA9548, PCF8574):
+
+    ```cpp
+    int readFromDevice(uint8_t &data);
+    ```
+
+- Read `count` bytes into `buffer` from the device. **`buffer` must be defined to have at least `count` elements.** Bytes received are placed in `buffer` LSB first (i.e., the first byte received is put in `buffer[0]`, second byte is `buffer[1]`, etc.). Used for devices which do not have registers (e.g. PCA9548, PCF8574):
+
+    ```cpp
+    int readFromDevice(uint8_t* buffer, uint8_t count);
+    ```
+
+### Other High Level Library Methods
+
+The following additional high level library methods can also be used to read and write data to an I2C device. See [below](#return-codes) for details on the return codes for these and the above methods.
 
 - Write a 16-bit `data` value to device register `regAddress`. The first byte written is the least signifcant byte of `data`:
 
@@ -85,30 +177,6 @@ The following high level library methods are used to read and write data to the 
     int myDevice.write2bToRegisterMSBFirst(int regAddress, uint16_t data);
     ```
 
-- Write `count` bytes from the location pointed to by `data_buffer` to register address `regAddress`:
-
-    ```cpp
-    int myDevice.writeBytesToRegister(int regAddress, uint8_t* data_buffer, uint8_t count);
-    ```
-
-- Write 8-bit `data` value to the device. This is used for devices which do not have registers (e.g. PCA9548, PCF8574):
-
-    ```cpp
-    int myDevice.write1bToDevice(uint8_t data);
-    ```
-
-- Write `count` bytes from the location pointed to by `data_buffer` to the device. This is used for devices which do not have registers (e.g. PCA9548, PCF8574):
-
-    ```cpp
-    int myDevice.writeBytesToDevice(uint8_t* data_buffer, uint8_t count);
-    ```
-
-- Read 8-bit value from register address `regAddress` into the location pointed to by `data_buffer`:
-
-    ```cpp
-    int myDevice.read1bFromRegister(int regAddress, uint8_t* data_buffer);
-    ```
-
 - Read 16-bit value from register address `regAddress` into the location pointed to by `data`. This function assumes that the first byte received is the least significant byte:
 
     ```cpp
@@ -119,26 +187,6 @@ The following high level library methods are used to read and write data to the 
 
     ```cpp
     int myDevice.read2bFromRegisterMSBFirst(int regAddress, uint16_t* data);
-    ```
-
-- Read `count` number of bytes from register address `regAddress` into the location pointed to by `data_buffer`. **`data_buffer` must be defined to have at least `count` elements.**
-Bytes received are placed in `data_buffer` LSB first (i.e., the first byte received is put in `data_buffer[0]`, second byte is `data_buffer[1]`, etc.):
-
-    ```cpp
-    int myDevice.readBytesFromRegister(int regAddress, uint8_t* data_buffer, uint8_t count);
-    ```
-
-- Read a byte from the device into the location pointed to by `data`. This is used for devices which do not have registers (e.g. PCA9548, PCF8574):
-
-    ```cpp
-    int myDevice.read1bFromDevice(uint8_t* data);
-    ```
-
-- Read `count` number of bytes from the device into the location pointed to by `data_buffer`. This is used for devices which do not have registers (e.g. PCA9548, PCF8574). **`data_buffer` must be defined to have at least `count` elements.**
-Bytes received are placed in `data_buffer` LSB first (i.e., the first byte received is put in `data_buffer[0]`, second byte is `data_buffer[1]`, etc.):
-
-    ```cpp
-    int myDevice.readBytesFromDevice(uint8_t* data_buffer, uint8_t count);
     ```
 
 #### Return Codes
@@ -260,9 +308,11 @@ Although general I2C communication can be done with the above `readFrom` and `wr
 
 The library does not use any platform-specific code. All I/O functions use standard Arduino `pinMode()`, `digitalRead()`, and `digitalWrite()` functions. Reading and writing to the I2C device is accomplished by stringing together the basic signaling primitives specified by the protocol.
 
-There are no hardcoded delays in the code. However, the high-level `readFrom()` and `writeTo()` methods are blocking -- they do not return until the message is completed or the clock-stretching timeout has been exceeded.
+There are no hardcoded delays in the code. However, the high-level `readFrom()` and `writeTo()` methods are blocking -- they do not return until the message is completed, a NACK is received, or the clock-stretching timeout has been exceeded.
 
 The clock-stretching timeout is implemented with a busy-wait loop in the `sclHi()` method which waits until the SCL line actually goes high before exiting the function. There is a default timeout of 500 ms before the wait times out and the function returns. This delay can be changed on a per-device basis (`setStretchTimeout()`). It can also be set to zero if no timeout is desired (which could potentially cause the library to "lock up" if the I2C device does not properly release the SCL line).
+
+Since this is a software-based, platform-agnostic implementation, the clock speed is not programmable and is significantly reduced compared to a hardware-based I2C implementation. Expect an I2C clock speed of about 25 KHz when using an 8 MHz microcontroller.
 
 ## Examples
 
@@ -286,7 +336,7 @@ Besides the sketches included in the `examples` folder, several more examples of
 - Texas Instruments [I2C Application Report][2]
 - [Clock Stretching][3]
 - Arduino Hardware I2C [Wire library][15]
-- PCA9548A 8 channel I2C switch [datasheet][16]
+- PCF8574A 8-bit I/O expander [datasheet][16]
   - Example of a device which does not have registers. I2C data is read/written immediately after sending the device address.
 
 ## License
@@ -302,7 +352,7 @@ The software and other files in this repository are released under what is commo
 [13]: https://github.com/Andy4495/MSP430TempSensorWithDisplay
 [14]: https://github.com/Andy4495/Sensor-Repeater
 [15]: https://www.arduino.cc/reference/en/language/functions/communication/wire/
-[16]: https://www.ti.com/lit/ds/symlink/pca9548a.pdf
+[16]: https://www.ti.com/lit/ds/symlink/pcf8574a.pdf
 [17]: https://www.i2c-bus.org/repeated-start-condition/
 [100]: https://choosealicense.com/licenses/mit/
 [101]: ./LICENSE

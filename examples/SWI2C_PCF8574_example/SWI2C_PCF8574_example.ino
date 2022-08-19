@@ -44,18 +44,40 @@ void loop() {
   if (currentmillis - lastmillis > delayTime) {
     lastmillis = currentmillis;
 
+    Serial.println("Reading PCF8574 input port value using several methods:");
+
+    // Basic high level method: 1 byte read, pass by reference
+    retval = myPCF.readFromDevice(data);
+    if (retval == 0) Serial.println("NACK received. Data is invalid.");
+    else {
+      Serial.print(" Input port value using 'readFromDevice(data)': ");
+      Serial.println(data);
+    }
+
+    // Basic high level method: read 1 byte into buffer
+    retval = myPCF.readFromDevice(array, 1);
+    if (retval == 0) Serial.println("NACK received. Data is invalid.");
+    else {
+      Serial.print(" Input port value using 'readFromDevice(array, 1)': ");
+      Serial.println(array[0]);
+    }
+
+    // Other high level method: 1 byte read, pass by pointer
     retval = myPCF.read1bFromDevice(&data);
     if (retval == 0) Serial.println("NACK received. Data is invalid.");
     else {
-      Serial.print("Reading PCF8574 input port value: ");
-      Serial.println(data);
+      Serial.print(" Input port value using 'read1bFromDevice(&data)': ");
+      Serial.println(array[0]);
     }
+    
+    // Other high level method: read 1 byte into buffer
     retval = myPCF.readBytesFromDevice(array, 1);
     if (retval == 0) Serial.println("NACK received. Data is invalid.");
     else {
-      Serial.print("Reading PCF8574 input port (using alternate method): ");
+      Serial.print(" Input port value using 'readBytesFromDevice(array, 1)': ");
       Serial.println(array[0]);
     }
+    
     Serial.println("");
 
   }
