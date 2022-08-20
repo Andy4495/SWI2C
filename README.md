@@ -2,6 +2,7 @@
 
 [![Arduino Compile Sketches](https://github.com/Andy4495/SWI2C/actions/workflows/arduino-compile-sketches.yml/badge.svg)](https://github.com/Andy4495/SWI2C/actions/workflows/arduino-compile-sketches.yml)
 [![Check Markdown Links](https://github.com/Andy4495/SWI2C/actions/workflows/CheckMarkdownLinks.yml/badge.svg)](https://github.com/Andy4495/SWI2C/actions/workflows/CheckMarkdownLinks.yml)
+[![Arduino Lint](https://github.com/Andy4495/SWI2C/actions/workflows/arduino-lint.yml/badge.svg)](https://github.com/Andy4495/SWI2C/actions/workflows/arduino-lint.yml)
 
 This library implements a software I2C controller interface. It was written without any platform-specific code, and should therefore work on any platform supported by the Arduino or Energia IDEs.
 
