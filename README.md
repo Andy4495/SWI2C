@@ -357,4 +357,4 @@ The software and other files in this repository are released under what is commo
 [17]: https://www.i2c-bus.org/repeated-start-condition/
 [100]: https://choosealicense.com/licenses/mit/
 [101]: ./LICENSE
-[200]: https://github.com/Andy4495/SWI2C
+[//]: # ([200]: https://github.com/Andy4495/SWI2C)
