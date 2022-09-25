@@ -28,6 +28,9 @@ jobs:
       - name: Trigger build on Outdoor-Weather-Sensor
         run: |
           curl -X POST https://api.github.com/repos/Andy4495/Outdoor-Weather-Sensor/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main", "inputs":{"message":"Triggered by ${{ github.repository }} from ${{ github.workflow }} workflow run number ${{ github.run_number }}"}}'
+      - name: Trigger build on MSP430TempSensorLCD
+        run: |
+          curl -X POST https://api.github.com/repos/Andy4495/MSP430TempSensorLCD/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main", "inputs":{"message":"Triggered by ${{ github.repository }} from ${{ github.workflow }} workflow run number ${{ github.run_number }}"}}'
       - name: Print job summary
         run: | 
           echo Event name: ${{ github.event_name }} >$GITHUB_STEP_SUMMARY
