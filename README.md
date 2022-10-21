@@ -73,7 +73,7 @@ void loop() {
   // Write a byte to a device register: 
   myDevice.writeToRegister(regAddress, byte_to_write);
   // Read a byte from a device register: 
-  myDevice.readFromRegister(regAddress, byte_to_read);
+  myDevice.readFromRegister(regAddress, &byte_to_read);
 
   // Write several bytes to a device register:
   myDevice.writeToRegister(regAddress, buffer, 10);
