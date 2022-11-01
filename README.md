@@ -333,7 +333,9 @@ Besides the sketches included in the `examples` folder, several more examples of
 
 ## References
 
-- NXP [I2C Bus Specification and User Manual][1]
+- NXP [I2C Bus Specification and User Manual][1] (NXP login required)
+- NXP [I2C Bus Specification and User Manual][18] available from Pololu
+- NXP [I2C Application Note/Manual][19] (published 2003, possibly outdated)
 - Texas Instruments [I2C Application Report][2]
 - [Clock Stretching][3]
 - Arduino Hardware I2C [Wire library][15]
@@ -344,6 +346,7 @@ Besides the sketches included in the `examples` folder, several more examples of
 
 The software and other files in this repository are released under what is commonly called the [MIT License][100]. See the file [`LICENSE`][101] in this repository.
 
+<!-- markdown-link-check-disable-next-line -->
 [1]: https://www.nxp.com/docs/en/user-guide/UM10204.pdf
 [2]: http://www.ti.com/lit/an/slva704/slva704.pdf
 [3]: https://www.i2c-bus.org/clock-stretching/
@@ -355,6 +358,8 @@ The software and other files in this repository are released under what is commo
 [15]: https://www.arduino.cc/reference/en/language/functions/communication/wire/
 [16]: https://www.ti.com/lit/ds/symlink/pcf8574a.pdf
 [17]: https://www.i2c-bus.org/repeated-start-condition/
+[18]: https://www.pololu.com/file/0J435/UM10204.pdf
+[19]: https://www.nxp.com/docs/en/application-note/AN10216.pdf
 [100]: https://choosealicense.com/licenses/mit/
 [101]: ./LICENSE
 [//]: # ([200]: https://github.com/Andy4495/SWI2C)
