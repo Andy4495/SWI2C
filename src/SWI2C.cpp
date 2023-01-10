@@ -13,6 +13,7 @@
    07/27/2022 - Andy4495 - Support single-register devices (Issue #3)
    08/19/2022 - Andy4495 - Consistently use unsigned, fix-sized types where appropriate
                          - Add simpler, basic high-level methods
+   01/10/2023 - Andy4495 - Fix #9 (send NACK after reading byte from device)
 */
 
 #include "SWI2C.h"
@@ -137,6 +138,7 @@ int SWI2C::readFromDevice(uint8_t &data, bool sendStopBit) {
   writeAddress(1); // 1 == Read bit
   if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
   data = read1Byte();
+  checkAckBit(); // Controller needs to send NACK when done reading data
   if (sendStopBit) stopBit();
   return 1;  // Return 1 if no NACKs  
 }
@@ -267,6 +269,7 @@ int SWI2C::read1bFromDevice(uint8_t* data, bool sendStopBit){
   writeAddress(1); // 1 == Read bit
   if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
   *data = read1Byte();
+  checkAckBit(); // Controller needs to send NACK when done reading data
   if (sendStopBit) stopBit();
   return 1;  // Return 1 if no NACKs  
 }
