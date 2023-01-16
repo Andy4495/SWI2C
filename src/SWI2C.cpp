@@ -14,6 +14,7 @@
    08/19/2022 - Andy4495 - Consistently use unsigned, fix-sized types where appropriate
                          - Add simpler, basic high-level methods
    01/10/2023 - Andy4495 - Fix #9 (send NACK after reading byte from device)
+   01/15/2023 - Andy4495 - Fix #10 (check ack after writing byte to device)
 */
 
 #include "SWI2C.h"
@@ -47,6 +48,7 @@ int SWI2C::writeToRegister(uint8_t regAddress, uint8_t data, bool sendStopBit) {
   if (sendStopBit) stopBit();
   return 1;  // Return 1 if no NACKs
 }
+
 int SWI2C::writeToRegister(uint8_t regAddress, uint8_t* buffer, uint8_t count, bool sendStopBit) { 
   // Writes <count> bytes after sending device address and register address.
   // Least significant byte is written first, ie. buffer[0] sent first
@@ -71,9 +73,11 @@ int SWI2C::writeToDevice(uint8_t data, bool sendStopBit) {
   writeAddress(0);
   if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
   writeByte(data);
+  if (checkAckBit()) {stopBit(); return 0;} // Immediately end transmission and return 0 if NACK detected
   if (sendStopBit) stopBit();
   return 1;  // Return 1 if no NACKs  
 }
+
 int SWI2C::writeToDevice(uint8_t* buffer, uint8_t count, bool sendStopBit) {
   // Use with devices that do not use register addresses. 
   // Writes <count> bytes after sending device address.
@@ -106,6 +110,7 @@ int SWI2C::readFromRegister(uint8_t regAddress, uint8_t &data, bool sendStopBit)
   if (sendStopBit) stopBit();
   return 1;  // Return 1 if no NACKs
 }
+
 int SWI2C::readFromRegister(uint8_t regAddress, uint8_t* buffer, uint8_t count, bool sendStopBit) {
   // Reads <count> bytes after sending device address and register address.
   // Bytes are returned in <buffer>, which is assumed to be at least <count> bytes in size.
@@ -131,6 +136,7 @@ int SWI2C::readFromRegister(uint8_t regAddress, uint8_t* buffer, uint8_t count, 
   if (sendStopBit) stopBit();
   return 1;  // Return 1 if no NACKs
 }
+
 int SWI2C::readFromDevice(uint8_t &data, bool sendStopBit) {
   // Use this with devices that do not use register addresses.
 
@@ -142,6 +148,7 @@ int SWI2C::readFromDevice(uint8_t &data, bool sendStopBit) {
   if (sendStopBit) stopBit();
   return 1;  // Return 1 if no NACKs  
 }
+
 int SWI2C::readFromDevice(uint8_t* buffer, uint8_t count, bool sendStopBit) {
   // Use this with devices that do not use register addresses.
   // Reads <count> bytes after sending device address.
