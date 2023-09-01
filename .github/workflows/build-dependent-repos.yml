@@ -5,33 +5,37 @@ on:
   release:
     types: [published,edited]
   workflow_dispatch:
+    inputs:
+      message:
+        description: Message to display in job summary
+        required: false
+        type: string
 
 jobs:
   build-dependent-repos:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger build on Weather_Sensors_SWI2C
-        run: |
-          curl -X POST https://api.github.com/repos/Andy4495/Weather_Sensors_SWI2C/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main", "inputs":{"message":"Triggered by ${{ github.repository }} from ${{ github.workflow }} workflow run number ${{ github.run_number }}"}}'
-      - name: Trigger build on MSP430TempSensorWithDisplay
-        run: |
-          curl -X POST https://api.github.com/repos/Andy4495/MSP430TempSensorWithDisplay/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main", "inputs":{"message":"Triggered by ${{ github.repository }} from ${{ github.workflow }} workflow run number ${{ github.run_number }}"}}'
-      - name: Trigger build on Sensor-Repeater
-        run: |
-          curl -X POST https://api.github.com/repos/Andy4495/Sensor-Repeater/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main", "inputs":{"message":"Triggered by ${{ github.repository }} from ${{ github.workflow }} workflow run number ${{ github.run_number }}"}}'
-      - name: Trigger build on BQ27441_SWI2C
-        run: |
-          curl -X POST https://api.github.com/repos/Andy4495/BQ27441_SWI2C/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main", "inputs":{"message":"Triggered by ${{ github.repository }} from ${{ github.workflow }} workflow run number ${{ github.run_number }}"}}'
-      - name: Trigger build on EEPROM24C08_SWI2C
-        run: |
-          curl -X POST https://api.github.com/repos/Andy4495/EEPROM_24C08_SWI2C/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main", "inputs":{"message":"Triggered by ${{ github.repository }} from ${{ github.workflow }} workflow run number ${{ github.run_number }}"}}'
-      - name: Trigger build on Outdoor-Weather-Sensor
-        run: |
-          curl -X POST https://api.github.com/repos/Andy4495/Outdoor-Weather-Sensor/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main", "inputs":{"message":"Triggered by ${{ github.repository }} from ${{ github.workflow }} workflow run number ${{ github.run_number }}"}}'
-      - name: Trigger build on MSP430TempSensorLCD
-        run: |
-          curl -X POST https://api.github.com/repos/Andy4495/MSP430TempSensorLCD/actions/workflows/arduino-compile-sketches.yml/dispatches -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.FORCE_REBUILD }}" -d '{"ref":"main", "inputs":{"message":"Triggered by ${{ github.repository }} from ${{ github.workflow }} workflow run number ${{ github.run_number }}"}}'
-      - name: Print job summary
-        run: | 
-          echo Event name: ${{ github.event_name }} >$GITHUB_STEP_SUMMARY
+    strategy:
+      matrix:
+        include:
+          - name: Trigger build on Weather_Sensors_SWI2C
+            repo: Weather_Sensors_SWI2C
+          - name: Trigger build on MSP430TempSensorWithDisplay
+            repo: MSP430TempSensorWithDisplay
+          - name: Trigger build on Sensor-Repeater
+            repo: Sensor-Repeater
+          - name: Trigger build on BQ27441_SWI2C
+            repo: BQ27441_SWI2C
+          - name: Trigger build on EEPROM24C08_SWI2C
+            repo: EEPROM24C08_SWI2C
+          - name: Trigger build on Outdoor-Weather-Sensor
+            repo: Outdoor-Weather-Sensor
+          - name: Trigger build on MSP430TempSensorLCD
+            repo: MSP430TempSensorLCD
+
+    name: call-compile-sketches-workflow
+    uses: Andy4495/.github/.github/workflows/build-dependent-repos.yml@main
+    with:
+      message: ${{ inputs.message }}
+      repo-name: ${{ matrix.repo }}
+    secrets: inherit
+
             

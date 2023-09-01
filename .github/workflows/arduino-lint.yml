@@ -13,15 +13,8 @@ on:
 
 jobs:
   arduino-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: arduino/arduino-lint-action@v1
-        with:
-          library-manager: update
-          compliance: strict
-          verbose: true
-      - name: Print the job summary
-        if: ${{ inputs.message }}
-        run: |
-          echo ${{ inputs.message }} >$GITHUB_STEP_SUMMARY
+    name: call-arduino-lint-workflow
+    uses: Andy4495/.github/.github/workflows/arduino-lint.yml@main
+    with:
+      message: ${{ inputs.message }}
+    secrets: inherit
