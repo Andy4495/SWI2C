@@ -24,8 +24,8 @@ jobs:
             repo: Sensor-Repeater
           - name: Trigger build on BQ27441_SWI2C
             repo: BQ27441_SWI2C
-          - name: Trigger build on EEPROM24C08_SWI2C
-            repo: EEPROM24C08_SWI2C
+          - name: Trigger build on EEPROM_24C08_SWI2C
+            repo: EEPROM_24C08_SWI2C
           - name: Trigger build on Outdoor-Weather-Sensor
             repo: Outdoor-Weather-Sensor
           - name: Trigger build on MSP430TempSensorLCD
