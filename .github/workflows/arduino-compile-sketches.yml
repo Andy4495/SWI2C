@@ -14,7 +14,6 @@ on:
 jobs:
   compile-sketches: 
     strategy:
-      max-parallel: 1    # Temporarily add this line between strategy and matrix
       matrix:
         include:
           - arch: avr
