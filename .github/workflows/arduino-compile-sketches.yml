@@ -46,7 +46,7 @@ jobs:
             platform-sourceurl: 'https://espressif.github.io/arduino-esp32/package_esp32_index.json'
 
     name: call-compile-sketches-workflow
-    uses: Andy4495/.github/.github/workflows/arduino-compile-sketches.yml@main
+    uses: Andy4495/.github/.github/workflows/arduino-compile-sketches.yml@test-latest-compile-sketches-main
     with:
       message: ${{ inputs.message }}
       copyfile: 
