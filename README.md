@@ -1,7 +1,7 @@
 # SWI2C - Software I2C Library
 
 [![Arduino Compile Sketches](https://github.com/Andy4495/SWI2C/actions/workflows/arduino-compile-sketches.yml/badge.svg)](https://github.com/Andy4495/SWI2C/actions/workflows/arduino-compile-sketches.yml)
-[![Check Markdown Links](https://github.com/Andy4495/SWI2C/actions/workflows/CheckMarkdownLinks.yml/badge.svg)](https://github.com/Andy4495/SWI2C/actions/workflows/CheckMarkdownLinks.yml)
+[![Check Markdown Links](https://github.com/Andy4495/SWI2C/actions/workflows/check-links.yml/badge.svg)](https://github.com/Andy4495/SWI2C/actions/workflows/check-links.yml)
 [![Arduino Lint](https://github.com/Andy4495/SWI2C/actions/workflows/arduino-lint.yml/badge.svg)](https://github.com/Andy4495/SWI2C/actions/workflows/arduino-lint.yml)
 
 This library implements a software I2C controller interface. It was written without any platform-specific code, and should therefore work on any platform supported by the Arduino or Energia IDEs.
@@ -346,7 +346,6 @@ Besides the sketches included in the `examples` folder, several more examples of
 
 The software and other files in this repository are released under what is commonly called the [MIT License][100]. See the file [`LICENSE`][101] in this repository.
 
-<!-- markdown-link-check-disable-next-line -->
 [1]: https://www.nxp.com/docs/en/user-guide/UM10204.pdf
 [2]: http://www.ti.com/lit/an/slva704/slva704.pdf
 [3]: https://www.i2c-bus.org/clock-stretching/
