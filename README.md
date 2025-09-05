@@ -20,21 +20,22 @@ I consider the Arduino Wire library needlessly complicated, particularly for beg
     - The API should provide the hooks necessary to support more complicated communications, but not at the expense of ease-of-use for the most common use cases.
 2. The Wire library abstracts the I2C *hardware interface* as the object being acted on.
     - From a design standpoint, I would suggest that the actual I2C *device* is the object that is being acted on.  
-    - The interface should therefore be modeled with the *device* as the object instantiated in code, not the hardware interface.  
+    - The interface should therefore be modeled with the *device* as the object instantiated in code, not the hardware interface.
 
-This software I2C library was designed so that the I2C *device* is the object that is instantiated and being acted on by the various methods. The API provides several simple `readFrom()` and `writeTo()` methods, while also including low-level signaling functionality to create more complicated communication flows when necessary.
+This library addresses both of these shortcomings:
+
+- Simple `readFrom()` and `writeTo()` methods are provided by the class
+- The I2C *device* (not the I2C bus) is the object that is instantiated and acted on by the class methods
 
 ## Additional Software I2C Improvements
 
-In addition to simplifying the user interface compared to Wire, this library also addresses the following shortcomings of some of the other software I2C libraries:
+In addition to simplifying the user interface compared to Wire, this library addresses the following shortcomings of some other software I2C libraries:
 
 - Hardcoded delays
   - Hardcoded delays should not be necessary at the "slow" signaling speeds inherent in a software-based I2C solution using `digitalWrite()` and `pinMode()` methods.
-- Lack of or incorrect support of clock stretching
+- Incorrect or no support for clock stretching
 - Incorrectly using `pinMode(OUTPUT)` and `digitalWrite(HIGH)` for indicating a "HIGH" value on SCL or SDA
   - Since I2C is an open-collector design that requires pull-up resistors, a "high" value on the data and clock lines should be implemented by putting the pin in `INPUT` mode. `INPUT` mode does not drive the bus high or low,  and allows the external pull-ups to assert the high level.
-
-This library implements the I2C protocol without the above issues.
 
 ## Basic Usage Example
 
@@ -315,15 +316,15 @@ The clock-stretching timeout is implemented with a busy-wait loop in the `sclHi(
 
 Since this is a software-based, platform-agnostic implementation, the clock speed is not programmable and is significantly reduced compared to a hardware-based I2C implementation. Expect an I2C clock speed of about 25 KHz when using an 8 MHz microcontroller.
 
-## Examples
+## Examples Sketches
 
-Two example sketches use several of the high level `readFrom()` and `writeTo()` class methods.
+The [SWI2C_example](./examples/SWI2C_example/SWI2C_example.ino) and [SWI2C_PCF8574_example](./examples/SWI2C_PCF8574_example/SWI2C_PCF8574_example.ino) sketches use the simple high level `readFrom()` class methods.
 
-One of the example sketches implements an I2C address scanner which uses several low level class methods.
+The [SWI2C_Address_Scanner](./examples/SWI2C_Address_Scanner/SWI2C_Address_Scanner.ino) sketch implements an I2C address scanner using some of the low level class methods.
 
 ## Additional Code Examples
 
-Besides the sketches included in the `examples` folder, several more examples of code using SWI2C are available in my other published libraries and sketches:
+Besides the sketches included in the [`examples`](./examples/) folder, several more examples of code using SWI2C are available in my other published libraries and sketches:
 
 - Weather Sensors Software I2C [Library][10]
 - EEPROM Software I2C [Library][11]
@@ -333,7 +334,7 @@ Besides the sketches included in the `examples` folder, several more examples of
 
 ## References
 
-- NXP [I2C Bus Specification and User Manual][1] (NXP login required)
+- NXP [I2C Bus Specification and User Manual][1]
 - NXP [I2C Bus Specification and User Manual][18] available from Pololu
 - NXP [I2C Application Note/Manual][19] (published 2003, possibly outdated)
 - Texas Instruments [I2C Application Report][2]
