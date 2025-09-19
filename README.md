@@ -4,7 +4,7 @@
 [![Check Markdown Links](https://github.com/Andy4495/SWI2C/actions/workflows/check-links.yml/badge.svg)](https://github.com/Andy4495/SWI2C/actions/workflows/check-links.yml)
 [![Arduino Lint](https://github.com/Andy4495/SWI2C/actions/workflows/arduino-lint.yml/badge.svg)](https://github.com/Andy4495/SWI2C/actions/workflows/arduino-lint.yml)
 
-This library implements a software I2C controller interface. It was written without any platform-specific code, and should therefore work on any platform supported by the Arduino or Energia IDEs.
+This library implements a software I2C controller interface for Arduino. It was written without any platform-specific code, and should therefore work on any platform supported by the Arduino IDE or CLI.
 
 ## Comparison to Arduino Wire Library
 
