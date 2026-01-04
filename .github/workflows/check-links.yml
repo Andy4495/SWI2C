@@ -29,5 +29,5 @@ jobs:
       override-args: ${{ inputs.override-args }}
       # Use the following to exclude certain URLs from the check. Need to include "--exclude" in the definition.
       # For example, --exclude '43oh.com'
-      exclude: 
+      exclude: --exclude 'nxp.com'
     
