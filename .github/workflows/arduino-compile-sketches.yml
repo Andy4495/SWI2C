@@ -48,6 +48,10 @@ jobs:
             fqbn: 'esp32:esp32:esp32'
             platform-name: 'esp32:esp32'
             platform-sourceurl: 'https://espressif.github.io/arduino-esp32/package_esp32_index.json'
+          - arch: unoq
+            fqbn: arduino:zephyr:unoq
+            platform-name: arduino:zephyr
+            platform-sourceurl: https://downloads.arduino.cc/packages/package_index.json
 
     name: call-compile-sketches-workflow
     uses: Andy4495/.github/.github/workflows/arduino-compile-sketches.yml@main
