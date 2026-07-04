@@ -342,6 +342,7 @@ Besides the sketches included in the [`examples`](./examples/) folder, several m
 - Arduino Hardware I2C [Wire library][15]
 - PCF8574A 8-bit I/O expander [datasheet][16]
   - Example of a device which does not have registers. I2C data is read/written immediately after sending the device address.
+- Aduino UNO Q [testing][20] to [verify support][21]
 
 ## License
 
@@ -360,6 +361,8 @@ The software and other files in this repository are released under what is commo
 [17]: https://www.i2c-bus.org/repeated-start-condition/
 [18]: https://www.pololu.com/file/0J435/UM10204.pdf
 [19]: https://www.nxp.com/docs/en/application-note/AN10216.pdf
+[20]: https://github.com/Andy4495/SWI2C/issues/12
+[21]: https://forum.arduino.cc/t/successfully-tested-swi2c-with-mpu6050-on-arduino-uno-q-software-i-c-on-arbitrary-gpio-pins/1450469
 [100]: https://choosealicense.com/licenses/mit/
 [101]: ./LICENSE
 [//]: # ([200]: https://github.com/Andy4495/SWI2C)
