@@ -4,7 +4,7 @@
 
    MIT License
 
-   07/03/2026 - Original
+   07/03/2026 - Original - by DRG-X (https://github.com/DRG-X)
    ----------------------------------------------------------------- */
 /* -----------------------------------------------------------------
    This example shows how to communicate with a typical register-based
